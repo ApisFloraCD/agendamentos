@@ -511,6 +511,7 @@
                 console.log(`✅ Carregados ${todosRegistros.length} registros`);
                 atualizarDashboard();
                 renderizarTodas();
+                atualizarSelects();
             } catch (err) {
                 console.error('Erro:', err);
             }
@@ -609,6 +610,36 @@
             renderizarTabela('AMAZON', 'tabelaAmazon', 2);
             renderizarTabela('SÃO PAULO', 'tabelaSaoPaulo', 3);
             renderizarTabela('PACHECO', 'tabelaPacheco', 4);
+        }
+
+        function atualizarSelects() {
+            const redes = ['AMAZON', 'SÃO PAULO', 'PACHECO'];
+            redes.forEach((rede, idx) => {
+                const abaIndex = idx + 2;
+                const selectTransp = document.getElementById(`filtroTransp${abaIndex}`);
+                if (!selectTransp) return;
+                
+                // Extrair todas as transportadoras únicas dessa rede
+                const transportadorasUniques = [...new Set(
+                    todosRegistros
+                        .filter(r => r.rede === rede && r.transportadora)
+                        .map(r => r.transportadora)
+                )].sort();
+                
+                // Manter valor selecionado
+                const valorAnterior = selectTransp.value;
+                selectTransp.innerHTML = '<option value="">Todos</option>';
+                
+                transportadorasUniques.forEach(transp => {
+                    const nome = transportadoras[transp] || transp;
+                    selectTransp.innerHTML += `<option value="${transp}">${nome}</option>`;
+                });
+                
+                // Restaurar valor se ainda existe
+                if (transportadorasUniques.includes(valorAnterior)) {
+                    selectTransp.value = valorAnterior;
+                }
+            });
         }
 
         function filtrarTabela(abaIndex) {
@@ -712,46 +743,50 @@
             }
 
             const totalRegistros = registros.length;
-            const limite = 50;  // Mostrar apenas 50 por vez
+            const limite = 50;
             const registrosMostrados = registros.slice(0, limite);
 
             const colunas = ['nf', 'num_pedido', 'dt_pedido', 'lead_time', 'cd', 'data_sap', 'data_faturamento', 'data_solicitacao', 'data_agendamento', 'data_reagendamento', 'data_expedicao', 'transportadora', 'status', 'data_entrega', 'observacao'];
             const labels = ['NF', 'Pedido', 'Dt Pedido', 'Lead Time', 'CD', 'Data SAP', 'Data Fat', 'Dt Solicit', 'Dt Agenda', 'Dt Reagenda', 'Data Exped', 'Transportadora', 'Status', 'Data Entrega', 'Observação'];
             const widths = ['80px', '80px', '85px', '70px', '60px', '85px', '85px', '85px', '85px', '85px', '85px', '130px', '130px', '85px', '100px'];
 
-            let html = `<div style="background: #f0fdf4; padding: 10px 15px; border-radius: 6px; margin-bottom: 15px; font-size: 12px; color: #065f46;">
-                <strong>📊 Mostrando ${registrosMostrados.length} de ${totalRegistros}</strong>
-                ${totalRegistros > limite ? ` (use filtros para refinar)` : ''}
-            </div>`;
-
-            html += `<table style="width: 100%;"><thead><tr>`;
+            // Construir HTML com array.join() - MUITO mais rápido!
+            const linhas = [];
+            
+            // Cabeçalho
+            linhas.push('<div style="background: #f0fdf4; padding: 10px 15px; border-radius: 6px; margin-bottom: 15px; font-size: 12px; color: #065f46;">');
+            linhas.push(`<strong>📊 Mostrando ${registrosMostrados.length} de ${totalRegistros}</strong>`);
+            if (totalRegistros > limite) linhas.push(` (use filtros para refinar)`);
+            linhas.push('</div>');
+            
+            linhas.push('<table style="width: 100%;"><thead><tr>');
             labels.forEach((label, i) => {
-                html += `<th style="width: ${widths[i]}; padding: 10px 8px; text-align: left; font-weight: 600; border-bottom: 1px solid #ddd; white-space: nowrap;">${label}</th>`;
+                linhas.push(`<th style="width: ${widths[i]}; padding: 10px 8px; text-align: left; font-weight: 600; border-bottom: 1px solid #ddd; white-space: nowrap;">${label}</th>`);
             });
-            html += `<th style="width: 150px; padding: 10px 8px;">Ações</th></tr></thead><tbody>`;
+            linhas.push('<th style="width: 150px; padding: 10px 8px;">Ações</th></tr></thead><tbody>');
 
+            // Linhas da tabela
             registrosMostrados.forEach(r => {
-                html += `<tr style="border-bottom: 1px solid #eee;">`;
+                linhas.push('<tr style="border-bottom: 1px solid #eee;">');
                 colunas.forEach((col, i) => {
                     let valor = r[col] || '-';
-                    // Se for transportadora, exibir o nome configurado
                     if (col === 'transportadora' && valor !== '-') {
                         valor = transportadoras[valor] || valor;
                     }
                     if (col.includes('data') && valor !== '-') {
                         valor = new Date(valor).toLocaleDateString('pt-BR');
                     }
-                    html += `<td style="width: ${widths[i]}; padding: 8px; word-break: break-word;">${valor}</td>`;
+                    linhas.push(`<td style="width: ${widths[i]}; padding: 8px; word-break: break-word;">${valor}</td>`);
                 });
-                html += `<td style="width: 150px; padding: 8px;"><div class="actions">
-                    <button class="btn btn-sm btn-rastrear" onclick="rastrear('${r.transportadora}', '${r.nf}')">Rastr</button>
-                    <button class="btn btn-sm btn-edit" onclick="abrirEdicao('${r.id}')">✏️</button>
-                    <button class="btn btn-sm btn-delete" onclick="deletarRegistro('${r.id}')">🗑️</button>
-                </div></td></tr>`;
+                linhas.push(`<td style="width: 150px; padding: 8px;"><div class="actions">`);
+                linhas.push(`<button class="btn btn-sm btn-rastrear" onclick="rastrear('${r.transportadora}', '${r.nf}')">Rastr</button>`);
+                linhas.push(`<button class="btn btn-sm btn-edit" onclick="abrirEdicao('${r.id}')">✏️</button>`);
+                linhas.push(`<button class="btn btn-sm btn-delete" onclick="deletarRegistro('${r.id}')">🗑️</button>`);
+                linhas.push(`</div></td></tr>`);
             });
 
-            html += '</tbody></table>';
-            container.innerHTML = html;
+            linhas.push('</tbody></table>');
+            container.innerHTML = linhas.join('');
         }
 
         function rastrear(transportadora, nf) {
