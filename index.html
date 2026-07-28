@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agendamentos de Expedição - Apis Flora</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0a3922 0%, #0b6136 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #0a3922 0%, #0b6136 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f5f5f5;
+            border-bottom: 2px solid #0b6136;
+            flex-wrap: wrap;
+            padding: 0;
+        }
+
+        .tab-btn {
+            flex: 1;
+            min-width: 100px;
+            padding: 15px 20px;
+            background: #f5f5f5;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            transition: all 0.3s;
+            border-bottom: 4px solid transparent;
+        }
+
+        .tab-btn:hover {
+            background: white;
+        }
+
+        .tab-btn.active {
+            color: white;
+            background: #0b6136;
+            border-bottom-color: #0a3922;
+        }
+
+        .content {
+            padding: 30px;
+            display: none;
+        }
+
+        .content.active {
+            display: block;
+        }
+
+        .form-container {
+            background: #f9f9f9;
+            padding: 25px;
+            border-radius: 8px;
+        }
+
+        .form-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #0a3922;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 6px;
+            font-size: 13px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #0b6136;
+            box-shadow: 0 0 0 3px rgba(11, 97, 54, 0.1);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #0a3922 0%, #0b6136 100%);
+            color: white;
+            width: 100%;
+            padding: 14px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(10, 57, 34, 0.2);
+        }
+
+        .btn-link {
+            background: #0b6136;
+            color: white;
+            font-size: 12px;
+            padding: 8px 12px;
+            display: inline-block;
+            text-decoration: none;
+        }
+
+        .message {
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .message.show {
+            display: block;
+        }
+
+        .message.success {
+            background: #d1fae5;
+            color: #065f46;
+            border-left: 4px solid #10b981;
+        }
+
+        .message.error {
+            background: #fee2e2;
+            color: #7f1d1d;
+            border-left: 4px solid #ef4444;
+        }
+
+        .config-section {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .config-section h3 {
+            color: #0a3922;
+            margin-bottom: 15px;
+        }
+
+        .config-item {
+            margin-bottom: 20px;
+        }
+
+        .config-item input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        thead {
+            background: #0a3922;
+            color: white;
+        }
+
+        th {
+            padding: 12px 8px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid #ddd;
+        }
+
+        tbody tr:hover {
+            background: #f5f5f5;
+        }
+
+        td {
+            padding: 10px 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📦 Agendamentos de Expedição</h1>
+            <p>Apis Flora Industrial e Comercial Ltda. - Ribeirão Preto</p>
+        </div>
+
+        <div id="message" class="message"></div>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="mudarAba(0)">➕ Entrada</button>
+            <button class="tab-btn" onclick="mudarAba(1)">🛍️ Amazon</button>
+            <button class="tab-btn" onclick="mudarAba(2)">📍 São Paulo</button>
+            <button class="tab-btn" onclick="mudarAba(3)">📦 Pacheco</button>
+            <button class="tab-btn" onclick="mudarAba(4)">🔍 Pesquisa</button>
+            <button class="tab-btn" onclick="mudarAba(5)">⚙️ Config</button>
+        </div>
+
+        <!-- ABA 0: ENTRADA -->
+        <div class="content active" id="aba-0">
+            <div class="form-container">
+                <div class="form-title">Lançamento de Novo Agendamento</div>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Rede de Destino *</label>
+                        <select id="rede">
+                            <option value="">-- Selecione --</option>
+                            <option value="AMAZON">AMAZON</option>
+                            <option value="SÃO PAULO">SÃO PAULO</option>
+                            <option value="PACHECO">PACHECO</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Data do Pedido *</label>
+                        <input type="date" id="dtPedido">
+                    </div>
+                    <div class="form-group">
+                        <label>Lead time (dias)</label>
+                        <input type="number" id="leadTime" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>CD</label>
+                        <input type="text" id="cd">
+                    </div>
+                    <div class="form-group">
+                        <label>Data SAP *</label>
+                        <input type="date" id="dataSap">
+                    </div>
+                    <div class="form-group">
+                        <label>Data Faturamento *</label>
+                        <input type="date" id="dataFaturamento">
+                    </div>
+                    <div class="form-group">
+                        <label>NF (Nota Fiscal) *</label>
+                        <input type="text" id="nf">
+                    </div>
+                    <div class="form-group">
+                        <label>Nº Pedido</label>
+                        <input type="text" id="numPedido">
+                    </div>
+                    <div class="form-group">
+                        <label>Data Solicitação</label>
+                        <input type="date" id="dataSolicitacao">
+                    </div>
+                    <div class="form-group">
+                        <label>Data Agendamento</label>
+                        <input type="date" id="dataAgendamento">
+                    </div>
+                    <div class="form-group">
+                        <label>Data Reagendamento</label>
+                        <input type="date" id="dataReagendamento">
+                    </div>
+                    <div class="form-group">
+                        <label>Data Expedição *</label>
+                        <input type="date" id="dataExpedicao">
+                    </div>
+                    <div class="form-group">
+                        <label>Transportadora</label>
+                        <select id="transportadora">
+                            <option value="">-- Selecione --</option>
+                            <option value="ATIVA">ATIVA</option>
+                            <option value="BRASPRESS">BRASPRESS</option>
+                            <option value="TROCA">TROCA</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select id="status">
+                            <option value="">-- Selecione --</option>
+                            <option value="ENTREGUE">ENTREGUE</option>
+                            <option value="EM ROTA">EM ROTA</option>
+                            <option value="ENTREGA AGENDADA">ENTREGA AGENDADA</option>
+                            <option value="AGUARDANDO AGENDAMENTO">AGUARDANDO AGENDAMENTO</option>
+                            <option value="CANCELADO">CANCELADO</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Data Entrega</label>
+                        <input type="date" id="dataEntrega">
+                    </div>
+                    <div class="form-group" style="grid-column: 1/-1;">
+                        <label>Observação</label>
+                        <textarea id="observacao" style="resize: vertical; min-height: 70px;"></textarea>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="salvarAgendamento()">💾 Salvar Agendamento</button>
+            </div>
+        </div>
+
+        <!-- ABA 1: AMAZON -->
+        <div class="content" id="aba-1">
+            <h2>Agendamentos Amazon</h2>
+            <p>Dados serão exibidos aqui após configurar Supabase</p>
+        </div>
+
+        <!-- ABA 2: SÃO PAULO -->
+        <div class="content" id="aba-2">
+            <h2>Agendamentos São Paulo</h2>
+            <p>Dados serão exibidos aqui após configurar Supabase</p>
+        </div>
+
+        <!-- ABA 3: PACHECO -->
+        <div class="content" id="aba-3">
+            <h2>Agendamentos Pacheco</h2>
+            <p>Dados serão exibidos aqui após configurar Supabase</p>
+        </div>
+
+        <!-- ABA 4: PESQUISA -->
+        <div class="content" id="aba-4">
+            <input type="text" id="searchInput" placeholder="🔍 Digite NF ou Nº do Pedido..." style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 20px;">
+            <div id="searchResults"></div>
+        </div>
+
+        <!-- ABA 5: CONFIG -->
+        <div class="content" id="aba-5">
+            <div class="config-section">
+                <h3>⚙️ Configuração do Supabase</h3>
+                
+                <div class="config-item">
+                    <label><strong>URL do Supabase</strong></label>
+                    <input type="text" id="supabaseUrl" placeholder="https://seu-projeto.supabase.co">
+                </div>
+
+                <div class="config-item">
+                    <label><strong>Chave Anon do Supabase</strong></label>
+                    <input type="password" id="supabaseKey" placeholder="eyJhbGc...">
+                </div>
+
+                <button class="btn btn-primary" onclick="salvarConfig()">Salvar Configuração</button>
+
+                <div style="margin-top: 30px; background: white; padding: 20px; border-radius: 8px;">
+                    <h4>Links de Rastreamento:</h4>
+                    <ul style="margin-left: 20px; margin-top: 10px; font-size: 13px;">
+                        <li><strong>ATIVA:</strong> https://ativalog.com.br/area-do-cliente/</li>
+                        <li><strong>BRASPRESS:</strong> https://www.braspress.com.br/w/tracking/</li>
+                        <li><strong>TROCA:</strong> https://rastreamento.grupotroca.com.br</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let sbClient = null;
+
+        function mudarAba(index) {
+            // Remove active de todos
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.content').forEach(div => div.classList.remove('active'));
+            
+            // Adiciona active no clicado
+            document.querySelectorAll('.tab-btn')[index].classList.add('active');
+            document.getElementById('aba-' + index).classList.add('active');
+        }
+
+        function mostrarMsg(texto, tipo) {
+            const msg = document.getElementById('message');
+            msg.textContent = texto;
+            msg.className = 'message show ' + tipo;
+            setTimeout(() => msg.classList.remove('show'), 3000);
+        }
+
+        function salvarConfig() {
+            const url = document.getElementById('supabaseUrl').value.trim();
+            const key = document.getElementById('supabaseKey').value.trim();
+
+            if (!url || !key) {
+                mostrarMsg('Preencha URL e Chave', 'error');
+                return;
+            }
+
+            localStorage.setItem('supabaseUrl', url);
+            localStorage.setItem('supabaseKey', key);
+            
+            try {
+                sbClient = window.supabase.createClient(url, key);
+                mostrarMsg('✅ Supabase configurado!', 'success');
+            } catch (err) {
+                mostrarMsg('❌ Erro ao configurar: ' + err.message, 'error');
+            }
+        }
+
+        function salvarAgendamento() {
+            if (!sbClient) {
+                mostrarMsg('Configure Supabase na aba Config', 'error');
+                return;
+            }
+
+            const rede = document.getElementById('rede').value;
+            if (!rede) {
+                mostrarMsg('Selecione uma rede', 'error');
+                return;
+            }
+
+            mostrarMsg('✅ Agendamento salvo! (teste)', 'success');
+        }
+
+        // Carregar config ao abrir
+        window.addEventListener('load', () => {
+            const url = localStorage.getItem('supabaseUrl');
+            const key = localStorage.getItem('supabaseKey');
+            if (url && key) {
+                document.getElementById('supabaseUrl').value = url;
+                document.getElementById('supabaseKey').value = key;
+            }
+        });
+    </script>
+</body>
+</html>
