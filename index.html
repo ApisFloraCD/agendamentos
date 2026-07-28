@@ -653,22 +653,31 @@
             // Mostrar "Carregando..." imediatamente
             const container = document.getElementById(containerId);
             if (container) {
-                container.innerHTML = '<div class="empty-state">⏳ Carregando...</div>';
+                container.innerHTML = '<div class="empty-state">⏳ Processando filtros...</div>';
             }
             
-            // Esperar 300ms e depois renderizar
+            // Esperar 500ms e depois renderizar
             debounceTimers[abaIndex] = setTimeout(() => {
                 const redes = ['', 'AMAZON', 'SÃO PAULO', 'PACHECO'];
-                renderizarTabela(redes[abaIndex], containerId, abaIndex);
-            }, 300);
+                
+                // Usar requestAnimationFrame para não bloquear UI
+                requestAnimationFrame(() => {
+                    renderizarTabela(redes[abaIndex], containerId, abaIndex);
+                });
+            }, 500);
         }
 
         function renderizarTabela(rede, containerId, abaIndex) {
             const container = document.getElementById(containerId);
+            
+            // PASSO 1: Filtrar por rede (rápido)
             let registros = todosRegistros.filter(r => r.rede === rede);
+            const totalPorRede = registros.length;
 
             if (abaIndex >= 2) {
-                // FILTRO: Busca NF/Pedido
+                // PASSO 2: Aplicar filtros em sequência (rápido)
+                
+                // Filtro 1: Busca NF/Pedido
                 const busca = document.getElementById(`buscaNF${abaIndex}`)?.value.toLowerCase() || '';
                 if (busca) {
                     registros = registros.filter(r => 
@@ -677,97 +686,83 @@
                     );
                 }
 
-                // FILTRO: Status específico
+                // Filtro 2: Status
                 const statusFiltro = document.getElementById(`filtroStatus${abaIndex}`)?.value || '';
                 if (statusFiltro) {
                     registros = registros.filter(r => r.status === statusFiltro);
                 }
 
-                // FILTRO: Tipo (não entregues, atrasados, entrega hoje)
+                // Filtro 3: Tipo
                 const tipoFiltro = document.getElementById(`filtroTipo${abaIndex}`)?.value || '';
-                const hoje = new Date().toISOString().split('T')[0];
-                
-                if (tipoFiltro === 'nao_entregues') {
-                    registros = registros.filter(r => r.status !== 'ENTREGUE' && r.status !== 'CANCELADO');
-                } else if (tipoFiltro === 'atrasados') {
-                    registros = registros.filter(r => {
-                        if (r.status === 'ENTREGUE' || r.status === 'CANCELADO') return false;
-                        if (!r.data_entrega) return false;
-                        return r.data_entrega < hoje;
-                    });
-                } else if (tipoFiltro === 'entrega_hoje') {
-                    registros = registros.filter(r => r.data_entrega === hoje);
+                if (tipoFiltro) {
+                    const hoje = new Date().toISOString().split('T')[0];
+                    if (tipoFiltro === 'nao_entregues') {
+                        registros = registros.filter(r => r.status !== 'ENTREGUE' && r.status !== 'CANCELADO');
+                    } else if (tipoFiltro === 'atrasados') {
+                        registros = registros.filter(r => 
+                            r.status !== 'ENTREGUE' && r.status !== 'CANCELADO' && r.data_entrega && r.data_entrega < hoje
+                        );
+                    } else if (tipoFiltro === 'entrega_hoje') {
+                        registros = registros.filter(r => r.data_entrega === hoje);
+                    }
                 }
 
-                // FILTRO: Transportadora
+                // Filtro 4: Transportadora
                 const transpFiltro = document.getElementById(`filtroTransp${abaIndex}`)?.value || '';
                 if (transpFiltro) {
                     registros = registros.filter(r => r.transportadora === transpFiltro);
                 }
 
-                // ORDENAÇÃO
-                const ordenacao = document.getElementById(`ordenacao${abaIndex}`)?.value || '';
-                if (ordenacao) {
-                    registros.sort((a, b) => {
-                        let campo, valA, valB;
-                        
-                        if (ordenacao.startsWith('nf_')) {
-                            campo = 'nf';
-                        } else if (ordenacao.startsWith('pedido_')) {
-                            campo = 'num_pedido';
-                        } else if (ordenacao.startsWith('data_')) {
-                            campo = 'data_entrega';
-                        }
-                        
-                        valA = a[campo] || '';
-                        valB = b[campo] || '';
-                        
-                        if (typeof valA === 'string') {
-                            valA = valA.toLowerCase();
-                            valB = valB.toLowerCase();
-                        }
-                        
+                // PASSO 3: Ordenação (apenas se houver resultado)
+                if (registros.length > 0) {
+                    const ordenacao = document.getElementById(`ordenacao${abaIndex}`)?.value || '';
+                    if (ordenacao) {
                         const isAsc = ordenacao.endsWith('_asc');
-                        if (isAsc) {
-                            return valA > valB ? 1 : valA < valB ? -1 : 0;
-                        } else {
-                            return valA < valB ? 1 : valA > valB ? -1 : 0;
+                        let campo;
+                        
+                        if (ordenacao.startsWith('nf_')) campo = 'nf';
+                        else if (ordenacao.startsWith('pedido_')) campo = 'num_pedido';
+                        else if (ordenacao.startsWith('data_')) campo = 'data_entrega';
+                        
+                        if (campo) {
+                            registros.sort((a, b) => {
+                                const valA = (a[campo] || '').toString().toLowerCase();
+                                const valB = (b[campo] || '').toString().toLowerCase();
+                                const cmp = valA.localeCompare(valB);
+                                return isAsc ? cmp : -cmp;
+                            });
                         }
-                    });
+                    }
                 }
             }
 
             if (registros.length === 0) {
-                container.innerHTML = '<div class="empty-state">📭 Nenhum agendamento encontrado com esses filtros</div>';
+                container.innerHTML = '<div class="empty-state">📭 Nenhum agendamento encontrado</div>';
                 return;
             }
 
-            const totalRegistros = registros.length;
+            // PASSO 4: Renderizar apenas os primeiros 50
             const limite = 50;
             const registrosMostrados = registros.slice(0, limite);
+            const totalRegistros = registros.length;
 
             const colunas = ['nf', 'num_pedido', 'dt_pedido', 'lead_time', 'cd', 'data_sap', 'data_faturamento', 'data_solicitacao', 'data_agendamento', 'data_reagendamento', 'data_expedicao', 'transportadora', 'status', 'data_entrega', 'observacao'];
             const labels = ['NF', 'Pedido', 'Dt Pedido', 'Lead Time', 'CD', 'Data SAP', 'Data Fat', 'Dt Solicit', 'Dt Agenda', 'Dt Reagenda', 'Data Exped', 'Transportadora', 'Status', 'Data Entrega', 'Observação'];
             const widths = ['80px', '80px', '85px', '70px', '60px', '85px', '85px', '85px', '85px', '85px', '85px', '130px', '130px', '85px', '100px'];
 
-            // Construir HTML com array.join() - MUITO mais rápido!
-            const linhas = [];
+            // Construir HTML super rápido
+            const html = [];
+            html.push(`<div style="background: #f0fdf4; padding: 10px 15px; border-radius: 6px; margin-bottom: 15px; font-size: 12px; color: #065f46;"><strong>📊 ${registrosMostrados.length} de ${totalRegistros}</strong>${totalRegistros > limite ? ' (refine filtros)' : ''}</div>`);
+            html.push('<table style="width: 100%;"><thead><tr>');
             
-            // Cabeçalho
-            linhas.push('<div style="background: #f0fdf4; padding: 10px 15px; border-radius: 6px; margin-bottom: 15px; font-size: 12px; color: #065f46;">');
-            linhas.push(`<strong>📊 Mostrando ${registrosMostrados.length} de ${totalRegistros}</strong>`);
-            if (totalRegistros > limite) linhas.push(` (use filtros para refinar)`);
-            linhas.push('</div>');
-            
-            linhas.push('<table style="width: 100%;"><thead><tr>');
             labels.forEach((label, i) => {
-                linhas.push(`<th style="width: ${widths[i]}; padding: 10px 8px; text-align: left; font-weight: 600; border-bottom: 1px solid #ddd; white-space: nowrap;">${label}</th>`);
+                html.push(`<th style="width: ${widths[i]}; padding: 10px 8px; text-align: left; font-weight: 600; border-bottom: 1px solid #ddd; white-space: nowrap;">${label}</th>`);
             });
-            linhas.push('<th style="width: 150px; padding: 10px 8px;">Ações</th></tr></thead><tbody>');
+            html.push('<th style="width: 150px; padding: 10px 8px;">Ações</th></tr></thead><tbody>');
 
-            // Linhas da tabela
+            // Renderizar linhas
             registrosMostrados.forEach(r => {
-                linhas.push('<tr style="border-bottom: 1px solid #eee;">');
+                html.push('<tr style="border-bottom: 1px solid #eee;">');
                 colunas.forEach((col, i) => {
                     let valor = r[col] || '-';
                     if (col === 'transportadora' && valor !== '-') {
@@ -776,17 +771,13 @@
                     if (col.includes('data') && valor !== '-') {
                         valor = new Date(valor).toLocaleDateString('pt-BR');
                     }
-                    linhas.push(`<td style="width: ${widths[i]}; padding: 8px; word-break: break-word;">${valor}</td>`);
+                    html.push(`<td style="width: ${widths[i]}; padding: 8px;">${valor}</td>`);
                 });
-                linhas.push(`<td style="width: 150px; padding: 8px;"><div class="actions">`);
-                linhas.push(`<button class="btn btn-sm btn-rastrear" onclick="rastrear('${r.transportadora}', '${r.nf}')">Rastr</button>`);
-                linhas.push(`<button class="btn btn-sm btn-edit" onclick="abrirEdicao('${r.id}')">✏️</button>`);
-                linhas.push(`<button class="btn btn-sm btn-delete" onclick="deletarRegistro('${r.id}')">🗑️</button>`);
-                linhas.push(`</div></td></tr>`);
+                html.push(`<td style="width: 150px; padding: 8px;"><div class="actions"><button class="btn btn-sm btn-rastrear" onclick="rastrear('${r.transportadora}', '${r.nf}')">Rastr</button><button class="btn btn-sm btn-edit" onclick="abrirEdicao('${r.id}')">✏️</button><button class="btn btn-sm btn-delete" onclick="deletarRegistro('${r.id}')">🗑️</button></div></td></tr>`);
             });
 
-            linhas.push('</tbody></table>');
-            container.innerHTML = linhas.join('');
+            html.push('</tbody></table>');
+            container.innerHTML = html.join('');
         }
 
         function rastrear(transportadora, nf) {
