@@ -722,6 +722,12 @@
                     <div class="form-title">📥 Importar Dados da Planilha</div>
                     <p style="color: #666; margin-bottom: 20px; font-size: 13px;">Importe dados de sua planilha Excel/CSV anterior. Formatos aceitos: .xlsx, .csv</p>
                     
+                    <div style="background: #fff3cd; border: 1px solid #ffc107; border-radius: 6px; padding: 12px; margin-bottom: 20px; font-size: 12px; color: #856404;">
+                        <strong>⚠️ Atenção:</strong> Se receber erro de "duplicate key", clique no botão abaixo para limpar todos os registros e importar do zero.
+                    </div>
+
+                    <button class="btn" style="background: #ef4444; color: white; width: 100%; margin-bottom: 15px;" onclick="limparTodosRegistros()">🗑️ Limpar Todos os Registros (Se houver erro de duplicação)</button>
+                    
                     <div class="import-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
                         <div style="font-size: 30px; margin-bottom: 10px;">📄</div>
                         <div style="font-weight: 600; color: #0a3922; margin-bottom: 5px;">Clique ou arraste arquivos aqui</div>
@@ -1132,6 +1138,29 @@
 
         function limparForm() {
             document.querySelectorAll('#aba-0 input, #aba-0 select, #aba-0 textarea').forEach(el => el.value = '');
+        }
+
+        async function limparTodosRegistros() {
+            if (!sbClient) {
+                mostrarToast('Configure Supabase na aba Config', 'error');
+                return;
+            }
+
+            const confirmar = confirm('⚠️ ATENÇÃO!\n\nIsso vai DELETAR TODOS os registros no banco de dados!\n\nDeseja continuar?');
+            if (!confirmar) return;
+
+            const confirmar2 = confirm('Tem CERTEZA? Essa ação é IRREVERSÍVEL!');
+            if (!confirmar2) return;
+
+            try {
+                const { error } = await sbClient.from('agendamentos').delete().neq('id', '');
+                if (error) throw error;
+
+                mostrarToast('Todos os registros foram deletados! Agora você pode importar.', 'success');
+                carregarTodos();
+            } catch (err) {
+                mostrarToast('Erro ao limpar: ' + err.message, 'error');
+            }
         }
 
         function importarArquivo(event) {
