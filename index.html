@@ -201,11 +201,13 @@
             <!-- ABA 2: AMAZON -->
             <div class="content" id="aba-2">
                 <div class="filters">
-                    <div class="filter-title">🔍 Filtros e Busca</div>
+                    <div class="filter-title">🔍 Filtros Avançados</div>
                     <div class="filter-grid">
-                        <div class="filter-group"><label>Buscar NF/Pedido</label><input type="text" id="buscaNF2" placeholder="Digite NF ou pedido..." onkeyup="filtrarTabela(2)"></div>
+                        <div class="filter-group"><label>Buscar NF/Pedido</label><input type="text" id="buscaNF2" placeholder="Digite NF ou pedido..." onchange="filtrarTabela(2)"></div>
                         <div class="filter-group"><label>Status</label><select id="filtroStatus2" onchange="filtrarTabela(2)"><option value="">Todos</option><option value="ENTREGUE">ENTREGUE</option><option value="EM ROTA">EM ROTA</option><option value="ENTREGA AGENDADA">ENTREGA AGENDADA</option><option value="AGUARDANDO AGENDAMENTO">AGUARDANDO AGENDAMENTO</option><option value="CANCELADO">CANCELADO</option></select></div>
+                        <div class="filter-group"><label>Tipo</label><select id="filtroTipo2" onchange="filtrarTabela(2)"><option value="">Todos</option><option value="nao_entregues">Não entregues ainda</option><option value="atrasados">Atrasados</option><option value="entrega_hoje">Entrega hoje</option></select></div>
                         <div class="filter-group"><label>Transportadora</label><select id="filtroTransp2" onchange="filtrarTabela(2)"><option value="">Todos</option></select></div>
+                        <div class="filter-group"><label>Ordenar por</label><select id="ordenacao2" onchange="filtrarTabela(2)"><option value="">Sem ordem</option><option value="nf_asc">NF (crescente)</option><option value="nf_desc">NF (decrescente)</option><option value="pedido_asc">Pedido (crescente)</option><option value="pedido_desc">Pedido (decrescente)</option><option value="data_asc">Data Entrega (antiga)</option><option value="data_desc">Data Entrega (recente)</option></select></div>
                     </div>
                 </div>
                 <div class="table-container" id="tabelaAmazon"></div>
@@ -214,11 +216,13 @@
             <!-- ABA 3: SÃO PAULO -->
             <div class="content" id="aba-3">
                 <div class="filters">
-                    <div class="filter-title">🔍 Filtros e Busca</div>
+                    <div class="filter-title">🔍 Filtros Avançados</div>
                     <div class="filter-grid">
-                        <div class="filter-group"><label>Buscar NF/Pedido</label><input type="text" id="buscaNF3" placeholder="Digite NF ou pedido..." onkeyup="filtrarTabela(3)"></div>
+                        <div class="filter-group"><label>Buscar NF/Pedido</label><input type="text" id="buscaNF3" placeholder="Digite NF ou pedido..." onchange="filtrarTabela(3)"></div>
                         <div class="filter-group"><label>Status</label><select id="filtroStatus3" onchange="filtrarTabela(3)"><option value="">Todos</option><option value="ENTREGUE">ENTREGUE</option><option value="EM ROTA">EM ROTA</option><option value="ENTREGA AGENDADA">ENTREGA AGENDADA</option><option value="AGUARDANDO AGENDAMENTO">AGUARDANDO AGENDAMENTO</option><option value="CANCELADO">CANCELADO</option></select></div>
+                        <div class="filter-group"><label>Tipo</label><select id="filtroTipo3" onchange="filtrarTabela(3)"><option value="">Todos</option><option value="nao_entregues">Não entregues ainda</option><option value="atrasados">Atrasados</option><option value="entrega_hoje">Entrega hoje</option></select></div>
                         <div class="filter-group"><label>Transportadora</label><select id="filtroTransp3" onchange="filtrarTabela(3)"><option value="">Todos</option></select></div>
+                        <div class="filter-group"><label>Ordenar por</label><select id="ordenacao3" onchange="filtrarTabela(3)"><option value="">Sem ordem</option><option value="nf_asc">NF (crescente)</option><option value="nf_desc">NF (decrescente)</option><option value="pedido_asc">Pedido (crescente)</option><option value="pedido_desc">Pedido (decrescente)</option><option value="data_asc">Data Entrega (antiga)</option><option value="data_desc">Data Entrega (recente)</option></select></div>
                     </div>
                 </div>
                 <div class="table-container" id="tabelaSaoPaulo"></div>
@@ -227,11 +231,13 @@
             <!-- ABA 4: PACHECO -->
             <div class="content" id="aba-4">
                 <div class="filters">
-                    <div class="filter-title">🔍 Filtros e Busca</div>
+                    <div class="filter-title">🔍 Filtros Avançados</div>
                     <div class="filter-grid">
-                        <div class="filter-group"><label>Buscar NF/Pedido</label><input type="text" id="buscaNF4" placeholder="Digite NF ou pedido..." onkeyup="filtrarTabela(4)"></div>
+                        <div class="filter-group"><label>Buscar NF/Pedido</label><input type="text" id="buscaNF4" placeholder="Digite NF ou pedido..." onchange="filtrarTabela(4)"></div>
                         <div class="filter-group"><label>Status</label><select id="filtroStatus4" onchange="filtrarTabela(4)"><option value="">Todos</option><option value="ENTREGUE">ENTREGUE</option><option value="EM ROTA">EM ROTA</option><option value="ENTREGA AGENDADA">ENTREGA AGENDADA</option><option value="AGUARDANDO AGENDAMENTO">AGUARDANDO AGENDAMENTO</option><option value="CANCELADO">CANCELADO</option></select></div>
+                        <div class="filter-group"><label>Tipo</label><select id="filtroTipo4" onchange="filtrarTabela(4)"><option value="">Todos</option><option value="nao_entregues">Não entregues ainda</option><option value="atrasados">Atrasados</option><option value="entrega_hoje">Entrega hoje</option></select></div>
                         <div class="filter-group"><label>Transportadora</label><select id="filtroTransp4" onchange="filtrarTabela(4)"><option value="">Todos</option></select></div>
+                        <div class="filter-group"><label>Ordenar por</label><select id="ordenacao4" onchange="filtrarTabela(4)"><option value="">Sem ordem</option><option value="nf_asc">NF (crescente)</option><option value="nf_desc">NF (decrescente)</option><option value="pedido_asc">Pedido (crescente)</option><option value="pedido_desc">Pedido (decrescente)</option><option value="data_asc">Data Entrega (antiga)</option><option value="data_desc">Data Entrega (recente)</option></select></div>
                     </div>
                 </div>
                 <div class="table-container" id="tabelaPacheco"></div>
@@ -318,7 +324,6 @@
         let sbClient = null;
         let todosRegistros = [];
         let registroEmEdicao = null;
-        let sortConfig = {};
         let transportadoras = {};
         let chartsInstances = {};
 
@@ -615,6 +620,7 @@
             let registros = todosRegistros.filter(r => r.rede === rede);
 
             if (abaIndex >= 2) {
+                // FILTRO: Busca NF/Pedido
                 const busca = document.getElementById(`buscaNF${abaIndex}`)?.value.toLowerCase() || '';
                 if (busca) {
                     registros = registros.filter(r => 
@@ -623,19 +629,68 @@
                     );
                 }
 
+                // FILTRO: Status específico
                 const statusFiltro = document.getElementById(`filtroStatus${abaIndex}`)?.value || '';
                 if (statusFiltro) {
                     registros = registros.filter(r => r.status === statusFiltro);
                 }
 
+                // FILTRO: Tipo (não entregues, atrasados, entrega hoje)
+                const tipoFiltro = document.getElementById(`filtroTipo${abaIndex}`)?.value || '';
+                const hoje = new Date().toISOString().split('T')[0];
+                
+                if (tipoFiltro === 'nao_entregues') {
+                    registros = registros.filter(r => r.status !== 'ENTREGUE' && r.status !== 'CANCELADO');
+                } else if (tipoFiltro === 'atrasados') {
+                    registros = registros.filter(r => {
+                        if (r.status === 'ENTREGUE' || r.status === 'CANCELADO') return false;
+                        if (!r.data_entrega) return false;
+                        return r.data_entrega < hoje;
+                    });
+                } else if (tipoFiltro === 'entrega_hoje') {
+                    registros = registros.filter(r => r.data_entrega === hoje);
+                }
+
+                // FILTRO: Transportadora
                 const transpFiltro = document.getElementById(`filtroTransp${abaIndex}`)?.value || '';
                 if (transpFiltro) {
                     registros = registros.filter(r => r.transportadora === transpFiltro);
                 }
+
+                // ORDENAÇÃO
+                const ordenacao = document.getElementById(`ordenacao${abaIndex}`)?.value || '';
+                if (ordenacao) {
+                    registros.sort((a, b) => {
+                        let campo, valA, valB;
+                        
+                        if (ordenacao.startsWith('nf_')) {
+                            campo = 'nf';
+                        } else if (ordenacao.startsWith('pedido_')) {
+                            campo = 'num_pedido';
+                        } else if (ordenacao.startsWith('data_')) {
+                            campo = 'data_entrega';
+                        }
+                        
+                        valA = a[campo] || '';
+                        valB = b[campo] || '';
+                        
+                        if (typeof valA === 'string') {
+                            valA = valA.toLowerCase();
+                            valB = valB.toLowerCase();
+                        }
+                        
+                        const isAsc = ordenacao.endsWith('_asc');
+                        if (isAsc) {
+                            return valA > valB ? 1 : valA < valB ? -1 : 0;
+                        } else {
+                            return valA < valB ? 1 : valA > valB ? -1 : 0;
+                        }
+                    });
+                }
             }
 
             if (registros.length === 0) {
-                container.innerHTML = '<div class="empty-state">📭 Nenhum agendamento</div>';
+                container.innerHTML = '<div class="empty-state">📭 Nenhum agendamento encontrado com esses filtros</div>';
                 return;
             }
 
@@ -645,35 +700,9 @@
 
             let html = `<table style="width: 100%;"><thead><tr>`;
             labels.forEach((label, i) => {
-                const coluna = colunas[i];
-                const sortDir = sortConfig[containerId]?.[coluna];
-                const indicator = sortDir === 'asc' ? ' ↑' : sortDir === 'desc' ? ' ↓' : '';
-                html += `<th style="width: ${widths[i]}; cursor: pointer; white-space: nowrap; user-select: none;" onclick="alterarSort('${containerId}', '${coluna}')">${label}<span class="sort-indicator">${indicator}</span></th>`;
+                html += `<th style="width: ${widths[i]}; padding: 10px 8px; text-align: left; font-weight: 600; border-bottom: 1px solid #ddd; white-space: nowrap;">${label}</th>`;
             });
-            html += `<th style="width: 150px;">Ações</th></tr></thead><tbody>`;
-
-            if (sortConfig[containerId]) {
-                const config = sortConfig[containerId];
-                const coluna = Object.keys(config)[0];
-                const direcao = config[coluna];
-                if (direcao) {
-                    registros.sort((a, b) => {
-                        let valA = a[coluna];
-                        let valB = b[coluna];
-                        if (!valA) valA = '';
-                        if (!valB) valB = '';
-                        if (typeof valA === 'string') {
-                            valA = valA.toLowerCase();
-                            valB = valB.toLowerCase();
-                        }
-                        if (direcao === 'asc') {
-                            return valA > valB ? 1 : valA < valB ? -1 : 0;
-                        } else {
-                            return valA < valB ? 1 : valA > valB ? -1 : 0;
-                        }
-                    });
-                }
-            }
+            html += `<th style="width: 150px; padding: 10px 8px;">Ações</th></tr></thead><tbody>`;
 
             registros.forEach(r => {
                 html += `<tr style="border-bottom: 1px solid #eee;">`;
@@ -697,27 +726,6 @@
 
             html += '</tbody></table>';
             container.innerHTML = html;
-        }
-
-        function alterarSort(containerId, coluna) {
-            if (!sortConfig[containerId]) {
-                sortConfig[containerId] = {};
-            }
-            const atual = sortConfig[containerId][coluna];
-            sortConfig[containerId] = {};
-            if (!atual) {
-                sortConfig[containerId][coluna] = 'asc';
-            } else if (atual === 'asc') {
-                sortConfig[containerId][coluna] = 'desc';
-            }
-            // Mapear containerId para abaIndex
-            const mapa = {
-                'tabelaAmazon': 2,
-                'tabelaSaoPaulo': 3,
-                'tabelaPacheco': 4
-            };
-            const abaIndex = mapa[containerId] || 0;
-            filtrarTabela(abaIndex);
         }
 
         function rastrear(transportadora, nf) {
