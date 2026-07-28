@@ -694,17 +694,26 @@
                 return;
             }
 
+            const totalRegistros = registros.length;
+            const limite = 200;  // Mostrar apenas 200 por vez
+            const registrosMostrados = registros.slice(0, limite);
+
             const colunas = ['nf', 'num_pedido', 'dt_pedido', 'lead_time', 'cd', 'data_sap', 'data_faturamento', 'data_solicitacao', 'data_agendamento', 'data_reagendamento', 'data_expedicao', 'transportadora', 'status', 'data_entrega', 'observacao'];
             const labels = ['NF', 'Pedido', 'Dt Pedido', 'Lead Time', 'CD', 'Data SAP', 'Data Fat', 'Dt Solicit', 'Dt Agenda', 'Dt Reagenda', 'Data Exped', 'Transportadora', 'Status', 'Data Entrega', 'Observação'];
             const widths = ['80px', '80px', '85px', '70px', '60px', '85px', '85px', '85px', '85px', '85px', '85px', '130px', '130px', '85px', '100px'];
 
-            let html = `<table style="width: 100%;"><thead><tr>`;
+            let html = `<div style="background: #f0fdf4; padding: 10px 15px; border-radius: 6px; margin-bottom: 15px; font-size: 12px; color: #065f46;">
+                <strong>📊 ${registrosMostrados.length} de ${totalRegistros} registros</strong>
+                ${totalRegistros > limite ? ` (mostrando os primeiros ${limite})` : ''}
+            </div>`;
+
+            html += `<table style="width: 100%;"><thead><tr>`;
             labels.forEach((label, i) => {
                 html += `<th style="width: ${widths[i]}; padding: 10px 8px; text-align: left; font-weight: 600; border-bottom: 1px solid #ddd; white-space: nowrap;">${label}</th>`;
             });
             html += `<th style="width: 150px; padding: 10px 8px;">Ações</th></tr></thead><tbody>`;
 
-            registros.forEach(r => {
+            registrosMostrados.forEach(r => {
                 html += `<tr style="border-bottom: 1px solid #eee;">`;
                 colunas.forEach((col, i) => {
                     let valor = r[col] || '-';
@@ -725,6 +734,15 @@
             });
 
             html += '</tbody></table>';
+            
+            if (totalRegistros > limite) {
+                html += `<div style="text-align: center; padding: 20px;">
+                    <div style="background: #fff3cd; padding: 10px; border-radius: 6px; margin-bottom: 10px; font-size: 12px; color: #856404;">
+                        ℹ️ Mostrando ${limite} de ${totalRegistros} registros para melhor performance. Use os filtros para refinar a busca.
+                    </div>
+                </div>`;
+            }
+
             container.innerHTML = html;
         }
 
