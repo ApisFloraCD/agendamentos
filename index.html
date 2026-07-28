@@ -447,6 +447,7 @@
                 mostrarToast('Configure Supabase', 'error');
                 return;
             }
+            const transportValue = document.getElementById('transportadora').value;
             const dados = {
                 rede: document.getElementById('rede').value || null,
                 dt_pedido: document.getElementById('dtPedido').value || null,
@@ -460,7 +461,7 @@
                 data_agendamento: document.getElementById('dataAgendamento').value || null,
                 data_reagendamento: document.getElementById('dataReagendamento').value || null,
                 data_expedicao: document.getElementById('dataExpedicao').value || null,
-                transportadora: document.getElementById('transportadora').value || null,
+                transportadora: transportValue || null,
                 status: (document.getElementById('status').value || '').toUpperCase().trim(),
                 data_entrega: document.getElementById('dataEntrega').value || null,
                 observacao: document.getElementById('observacao').value || null
@@ -484,11 +485,23 @@
                     console.error('Erro ao carregar:', error);
                     return;
                 }
-                // Normalizar status
-                todosRegistros = (data || []).map(r => ({
-                    ...r,
-                    status: r.status ? r.status.toUpperCase().trim() : null
-                }));
+                // Normalizar status e transportador
+                todosRegistros = (data || []).map(r => {
+                    let transportadora = r.transportadora || '';
+                    // Se for nome completo, converter para chave
+                    if (transportadora.includes('Dist.') || transportadora.includes('Logística')) {
+                        transportadora = 'ATIVA';
+                    } else if (transportadora.includes('Troca')) {
+                        transportadora = 'TROCA';
+                    } else if (transportadora.includes('Braspress')) {
+                        transportadora = 'BRASPRESS';
+                    }
+                    return {
+                        ...r,
+                        status: r.status ? r.status.toUpperCase().trim() : null,
+                        transportadora: transportadora
+                    };
+                });
                 console.log(`✅ Carregados ${todosRegistros.length} registros`);
                 atualizarDashboard();
                 renderizarTodas();
@@ -635,7 +648,7 @@
                 const coluna = colunas[i];
                 const sortDir = sortConfig[containerId]?.[coluna];
                 const indicator = sortDir === 'asc' ? ' ↑' : sortDir === 'desc' ? ' ↓' : '';
-                html += `<th style="width: ${widths[i]}; cursor: pointer; white-space: nowrap;" onclick="alterarSort('${containerId}', '${coluna}')">${label}<span class="sort-indicator">${indicator}</span></th>`;
+                html += `<th style="width: ${widths[i]}; cursor: pointer; white-space: nowrap; user-select: none;" onclick="alterarSort('${containerId}', '${coluna}')">${label}<span class="sort-indicator">${indicator}</span></th>`;
             });
             html += `<th style="width: 150px;">Ações</th></tr></thead><tbody>`;
 
@@ -666,6 +679,10 @@
                 html += `<tr style="border-bottom: 1px solid #eee;">`;
                 colunas.forEach((col, i) => {
                     let valor = r[col] || '-';
+                    // Se for transportadora, exibir o nome configurado
+                    if (col === 'transportadora' && valor !== '-') {
+                        valor = transportadoras[valor] || valor;
+                    }
                     if (col.includes('data') && valor !== '-') {
                         valor = new Date(valor).toLocaleDateString('pt-BR');
                     }
@@ -697,7 +714,7 @@
         }
 
         function rastrear(transportadora, nf) {
-            if (!nf || nf === 'null') {
+            if (!nf || nf === 'null' || nf === '-') {
                 alert('⚠️ NF não preenchida neste registro');
                 return;
             }
@@ -710,7 +727,7 @@
             if (url) {
                 window.open(url, '_blank');
             } else {
-                alert('⚠️ Transportadora sem link configurado');
+                alert('⚠️ Transportadora: ' + transportadora + ' sem link configurado');
             }
         }
 
@@ -746,6 +763,7 @@
 
         async function salvarEdicao() {
             if (!registroEmEdicao) return;
+            const transportValue = document.getElementById('edit_transportadora').value;
             const dados = {
                 ...registroEmEdicao,
                 nf: document.getElementById('edit_nf').value || null,
@@ -759,7 +777,7 @@
                 data_agendamento: document.getElementById('edit_dataAgendamento').value || null,
                 data_reagendamento: document.getElementById('edit_dataReagendamento').value || null,
                 data_expedicao: document.getElementById('edit_dataExpedicao').value || null,
-                transportadora: document.getElementById('edit_transportadora').value || null,
+                transportadora: transportValue || null,
                 status: (document.getElementById('edit_status').value || '').toUpperCase().trim(),
                 data_entrega: document.getElementById('edit_dataEntrega').value || null,
                 observacao: document.getElementById('edit_observacao').value || null
