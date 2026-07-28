@@ -1153,10 +1153,23 @@
             if (!confirmar2) return;
 
             try {
-                const { error } = await sbClient.from('agendamentos').delete().neq('id', '');
-                if (error) throw error;
+                // Buscar todos os registros
+                const { data, error: errorSelect } = await sbClient.from('agendamentos').select('id');
+                if (errorSelect) throw errorSelect;
 
-                mostrarToast('Todos os registros foram deletados! Agora você pode importar.', 'success');
+                if (!data || data.length === 0) {
+                    mostrarToast('Nenhum registro para deletar!', 'success');
+                    return;
+                }
+
+                // Deletar todos
+                const ids = data.map(r => r.id);
+                for (const id of ids) {
+                    const { error: errorDelete } = await sbClient.from('agendamentos').delete().eq('id', id);
+                    if (errorDelete) throw errorDelete;
+                }
+
+                mostrarToast(`${ids.length} registros deletados! Agora você pode importar.`, 'success');
                 carregarTodos();
             } catch (err) {
                 mostrarToast('Erro ao limpar: ' + err.message, 'error');
