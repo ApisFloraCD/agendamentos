@@ -468,6 +468,7 @@
         <div class="header">
             <h1>📦 Agendamentos de Expedição</h1>
             <p>Apis Flora Industrial e Comercial Ltda. - Ribeirão Preto</p>
+            <button class="btn btn-sm" style="background: white; color: #0a3922; margin-top: 10px; padding: 6px 12px; font-weight: 600;" onclick="forcarRecarregamento()">🔄 Recarregar Dados</button>
         </div>
 
         <div id="message" class="message"></div>
@@ -713,6 +714,9 @@
                 <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
                     <input type="text" id="searchInput" placeholder="🔍 Digite NF ou Nº do Pedido..." style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px;">
                 </div>
+                <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center;">
+                    <button class="btn btn-primary" onclick="mostrarTodos()" style="max-width: 300px;">📋 Ver TODOS os Registros</button>
+                </div>
                 <div class="table-container" id="searchResults"></div>
             </div>
 
@@ -869,15 +873,52 @@
             if (!sbClient) return;
 
             try {
-                const { data } = await sbClient.from('agendamentos').select('*').order('criado_em', { ascending: false });
+                const { data, error } = await sbClient.from('agendamentos').select('*').order('criado_em', { ascending: false });
+                if (error) {
+                    console.error('Erro ao carregar:', error);
+                    mostrarToast('Erro ao carregar dados: ' + error.message, 'error');
+                    return;
+                }
+                
                 todosRegistros = data || [];
+                console.log(`✅ Carregados ${todosRegistros.length} registros`);
                 renderizarTodas();
+                mostrarToast(`✅ ${todosRegistros.length} registros sincronizados!`, 'success');
             } catch (err) {
                 console.error('Erro:', err);
+                mostrarToast('Erro: ' + err.message, 'error');
+            }
+        }
+
+        async function forcarRecarregamento() {
+            if (!sbClient) {
+                mostrarToast('Configure Supabase na aba Config', 'error');
+                return;
+            }
+
+            try {
+                const { data, error } = await sbClient.from('agendamentos').select('*', { count: 'exact' });
+                if (error) throw error;
+
+                const totalRegistros = data ? data.length : 0;
+                mostrarToast(`Verificando... Total de ${totalRegistros} registros`, 'success');
+                
+                await carregarTodos();
+            } catch (err) {
+                mostrarToast('Erro: ' + err.message, 'error');
             }
         }
 
         function renderizarTodas() {
+            console.log('📊 Renderizando tabelas...');
+            console.log(`Total de registros: ${todosRegistros.length}`);
+            
+            const redes = ['AMAZON', 'SÃO PAULO', 'PACHECO'];
+            redes.forEach((rede, idx) => {
+                const registros = todosRegistros.filter(r => r.rede === rede);
+                console.log(`${rede}: ${registros.length} registros`);
+            });
+            
             renderizarTabela('AMAZON', 'tabelaAmazon', 1);
             renderizarTabela('SÃO PAULO', 'tabelaSaoPaulo', 2);
             renderizarTabela('PACHECO', 'tabelaPacheco', 3);
@@ -1334,6 +1375,52 @@
             html += '</tbody></table>';
             document.getElementById('searchResults').innerHTML = html;
         });
+
+        function mostrarTodos() {
+            if (todosRegistros.length === 0) {
+                document.getElementById('searchResults').innerHTML = '<div class="empty-state">📭 Nenhum registro encontrado</div>';
+                return;
+            }
+
+            let html = `<div style="background: #f0fdf4; padding: 15px; border-radius: 6px; margin-bottom: 15px; font-size: 13px;">
+                <strong>📊 Total: ${todosRegistros.length} registros</strong>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>NF</th>
+                        <th>Pedido</th>
+                        <th>Rede</th>
+                        <th>Dt Pedido</th>
+                        <th>Expedição</th>
+                        <th>Entrega</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>`;
+
+            todosRegistros.forEach(r => {
+                html += `<tr>
+                    <td><strong>${r.nf}</strong></td>
+                    <td>${r.num_pedido || '-'}</td>
+                    <td>${r.rede || '-'}</td>
+                    <td>${formatarData(r.dt_pedido)}</td>
+                    <td>${formatarData(r.data_expedicao)}</td>
+                    <td>${formatarData(r.data_entrega)}</td>
+                    <td>${getStatusBadge(r.status)}</td>
+                    <td>
+                        <div class="actions">
+                            <button class="btn btn-sm btn-edit" onclick="abrirEdicao('${r.id}')">✏️</button>
+                            <button class="btn btn-sm btn-delete" onclick="deletarRegistro('${r.id}')">🗑️</button>
+                        </div>
+                    </td>
+                </tr>`;
+            });
+
+            html += '</tbody></table>';
+            document.getElementById('searchResults').innerHTML = html;
+        }
 
         setInterval(() => { if (sbClient) carregarTodos(); }, 30000);
     </script>
