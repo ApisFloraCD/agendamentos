@@ -1223,25 +1223,21 @@
             if (!confirmar2) return;
 
             try {
-                // Buscar todos os registros
-                const { data, error: errorSelect } = await sbClient.from('agendamentos').select('id');
-                if (errorSelect) throw errorSelect;
+                mostrarToast('🗑️ Limpando registros... Aguarde...', 'success');
 
-                if (!data || data.length === 0) {
-                    mostrarToast('Nenhum registro para deletar!', 'success');
-                    return;
-                }
+                // Deletar TUDO de uma vez usando is not null
+                const { error, data } = await sbClient
+                    .from('agendamentos')
+                    .delete()
+                    .gt('criado_em', '2000-01-01'); // Delete tudo que foi criado após 2000
+                
+                if (error) throw error;
 
-                // Deletar todos
-                const ids = data.map(r => r.id);
-                for (const id of ids) {
-                    const { error: errorDelete } = await sbClient.from('agendamentos').delete().eq('id', id);
-                    if (errorDelete) throw errorDelete;
-                }
-
-                mostrarToast(`${ids.length} registros deletados! Agora você pode importar.`, 'success');
-                carregarTodos();
+                mostrarToast('✅ Todos os registros foram deletados! Pronto para importar.', 'success');
+                todosRegistros = [];
+                renderizarTodas();
             } catch (err) {
+                console.error('Erro ao limpar:', err);
                 mostrarToast('Erro ao limpar: ' + err.message, 'error');
             }
         }
