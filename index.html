@@ -1250,94 +1250,35 @@
             reader.onload = async (e) => {
                 try {
                     const data = e.target.result;
-                    let registrosFormatados = [];
 
                     // Ler o Excel
                     const workbook = XLSX.read(data, { type: 'binary' });
                     
                     console.log('📋 ABAS ENCONTRADAS:', workbook.SheetNames);
 
-                    // Importar abas de agendamento (ignorar BD, Informações, PESQUISA)
+                    // DEBUG: Mostrar colunas de cada aba ANTES de processar
                     const abas_validas = ['AMAZON', 'AMAZON1', 'SÃO PAULO', 'PACHECO'];
                     
-                    for (const sheet_name of workbook.SheetNames) {
-                        if (!abas_validas.includes(sheet_name)) {
-                            console.log(`⏭️ Ignorando aba: ${sheet_name}`);
-                            continue;
-                        }
+                    let debugInfo = '📋 DEBUG DE COLUNAS:\n\n';
 
-                        console.log(`📥 Processando aba: ${sheet_name}`);
-                        
+                    for (const sheet_name of workbook.SheetNames) {
+                        if (!abas_validas.includes(sheet_name)) continue;
+
                         const json = XLSX.utils.sheet_to_json(workbook.Sheets[sheet_name]);
                         
-                        if (json.length === 0) {
-                            console.log(`   (vazia)`);
-                            continue;
-                        }
+                        if (json.length === 0) continue;
 
-                        console.log(`   ${json.length} registros encontrados`);
-                        console.log(`   Colunas:`, Object.keys(json[0]));
-
-                        // Mapear os dados de acordo com a aba
-                        const registros_aba = json.map(row => {
-                            const registro = {
-                                rede: sheet_name === 'AMAZON1' ? 'AMAZON' : sheet_name,
-                                dt_pedido: formatarDataEntrada(row['Dt. Pedido']),
-                                lead_time: parseInt(row['Lead time']) || null,
-                                cd: row['CD'] || null,
-                                data_sap: formatarDataEntrada(row['Data. SAP']),
-                                data_faturamento: formatarDataEntrada(row[' Faturamento'] || row['Faturamento']),
-                                nf: row['NF'] || '',
-                                num_pedido: row['N° do Pedido'] || null,
-                                data_solicitacao: formatarDataEntrada(row['Data da Solicitação']),
-                                data_agendamento: formatarDataEntrada(row['Data Agendamento']),
-                                data_reagendamento: formatarDataEntrada(row['Data Reagendamento']),
-                                data_expedicao: formatarDataEntrada(row['Data Expedição']),
-                                transportadora: row['Transportadora'] || null,
-                                status: row['Status'] || null,
-                                data_entrega: formatarDataEntrada(row['Data Entrega']),
-                                observacao: row['Observação'] || row['Observações'] || null
-                            };
-                            return registro;
-                        });
-
-                        registrosFormatados = registrosFormatados.concat(registros_aba);
+                        const headers = Object.keys(json[0]);
+                        debugInfo += `ABA: ${sheet_name}\n`;
+                        debugInfo += `Colunas (${headers.length}): ${headers.join(' | ')}\n`;
+                        debugInfo += `1º registro: ${JSON.stringify(json[0], null, 2)}\n\n`;
                     }
 
-                    if (registrosFormatados.length === 0) {
-                        mostrarToast('Nenhum dado válido encontrado nas abas de agendamento', 'error');
-                        return;
-                    }
+                    console.log(debugInfo);
+                    alert(debugInfo + '\n\nVERIFIQUE O CONSOLE (F12) PARA DETALHES COMPLETOS!');
 
-                    // Mostrar resumo
-                    console.log(`✅ Total de registros para importar: ${registrosFormatados.length}`);
-
-                    if (!sbClient) {
-                        mostrarToast('Configure Supabase na aba Config', 'error');
-                        return;
-                    }
-
-                    // Importar em lotes (100 registros por vez)
-                    const tamanhoLote = 100;
-                    let registrosImportados = 0;
-
-                    for (let i = 0; i < registrosFormatados.length; i += tamanhoLote) {
-                        const lote = registrosFormatados.slice(i, i + tamanhoLote);
-                        const { error } = await sbClient.from('agendamentos').upsert(lote);
-                        
-                        if (error) {
-                            console.error(`Erro ao importar lote ${i/tamanhoLote + 1}:`, error);
-                            throw error;
-                        }
-
-                        registrosImportados += lote.length;
-                        const percentual = Math.round((registrosImportados / registrosFormatados.length) * 100);
-                        console.log(`   Progresso: ${percentual}% (${registrosImportados}/${registrosFormatados.length})`);
-                    }
-
-                    mostrarToast(`✅ ${registrosFormatados.length} registros importados e sincronizados!`, 'success');
-                    carregarTodos();
-                    document.getElementById('fileInput').value = '';
+                    // Não importar ainda - só debug
+                    return;
 
                 } catch (err) {
                     console.error('Erro ao importar:', err);
