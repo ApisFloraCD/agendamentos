@@ -64,7 +64,6 @@
         .status-em-rota { background: #dbeafe; color: #0c4a6e; }
         .status-agendado { background: #fef3c7; color: #78350f; }
         .empty-state { text-align: center; padding: 40px; color: #999; }
-        .tempo-cell { background: #f0fdf4; font-weight: 600; color: #0b6136; }
         .import-zone { border: 2px dashed #0b6136; border-radius: 8px; padding: 30px; text-align: center; margin-bottom: 20px; }
         .import-zone.dragover { background: #f0fdf4; }
         .import-zone input[type="file"] { display: none; }
@@ -351,14 +350,6 @@
             renderizarTabela('PACHECO', 'tabelaPacheco', 3);
         }
 
-        function calcularTempo(dataInicio, dataFim) {
-            if (!dataInicio || !dataFim) return '-';
-            const d1 = new Date(dataInicio);
-            const d2 = new Date(dataFim);
-            const dias = Math.floor((d2 - d1) / (1000 * 60 * 60 * 24));
-            return dias >= 0 ? dias + 'd' : '-';
-        }
-
         function filtrarTabela(abaIndex) {
             const redes = ['AMAZON', 'SÃO PAULO', 'PACHECO'];
             renderizarTabela(redes[abaIndex - 1], ['tabelaAmazon', 'tabelaSaoPaulo', 'tabelaPacheco'][abaIndex - 1], abaIndex);
@@ -381,24 +372,10 @@
                 return;
             }
 
-            let html = `<table><thead><tr><th>NF</th><th>Pedido</th><th>Dt Pedido</th><th>Lead Time</th><th>CD</th><th>Data SAP</th><th>Data Faturamento</th><th>Dt Solicitação</th><th>Dt Agendamento</th><th>Dt Reagendamento</th><th>Data Expedição</th><th>Transportadora</th><th>Status</th><th>Data Entrega</th><th>Observação</th><th class="tempo-cell">T. Digi</th><th class="tempo-cell">T. Fatu</th><th class="tempo-cell">T. Expe</th><th class="tempo-cell">T. Agen</th><th class="tempo-cell">T. Entre</th><th class="tempo-cell">Total</th><th>Ações</th></tr></thead><tbody>`;
+            let html = `<table><thead><tr><th>NF</th><th>Pedido</th><th>Dt Pedido</th><th>Lead Time</th><th>CD</th><th>Data SAP</th><th>Data Faturamento</th><th>Dt Solicitação</th><th>Dt Agendamento</th><th>Dt Reagendamento</th><th>Data Expedição</th><th>Transportadora</th><th>Status</th><th>Data Entrega</th><th>Observação</th><th>Ações</th></tr></thead><tbody>`;
 
             registros.forEach(r => {
-                const tempoDigitacao = calcularTempo(r.dt_pedido, r.data_sap);
-                const tempoFaturamento = calcularTempo(r.data_sap, r.data_faturamento);
-                const tempoExpedicao = calcularTempo(r.data_faturamento, r.data_expedicao);
-                const tempoEntrega = calcularTempo(r.data_expedicao, r.data_entrega);
-                
-                let totalLeadTime = '-';
-                if (tempoDigitacao !== '-' && tempoFaturamento !== '-' && tempoExpedicao !== '-' && tempoEntrega !== '-') {
-                    const tD = parseInt(tempoDigitacao);
-                    const tF = parseInt(tempoFaturamento);
-                    const tE = parseInt(tempoExpedicao);
-                    const tEn = parseInt(tempoEntrega);
-                    totalLeadTime = (tD + tF + tE + tEn) + 'd';
-                }
-
-                html += `<tr><td><strong>${r.nf}</strong></td><td>${r.num_pedido || '-'}</td><td>${formatarData(r.dt_pedido)}</td><td>${r.lead_time || '-'}</td><td>${r.cd || '-'}</td><td>${formatarData(r.data_sap)}</td><td>${formatarData(r.data_faturamento)}</td><td>${formatarData(r.data_solicitacao)}</td><td>${formatarData(r.data_agendamento)}</td><td>${formatarData(r.data_reagendamento)}</td><td>${formatarData(r.data_expedicao)}</td><td>${r.transportadora || '-'}</td><td>${r.status || '-'}</td><td>${formatarData(r.data_entrega)}</td><td>${r.observacao || '-'}</td><td class="tempo-cell">${tempoDigitacao}</td><td class="tempo-cell">${tempoFaturamento}</td><td class="tempo-cell">${tempoExpedicao}</td><td class="tempo-cell">-</td><td class="tempo-cell">${tempoEntrega}</td><td class="tempo-cell">${totalLeadTime}</td><td><div class="actions"><button class="btn btn-sm btn-rastrear" onclick="rastrear('${r.transportadora}', '${r.nf}')">Rastrear</button><button class="btn btn-sm btn-edit" onclick="abrirEdicao('${r.id}')">✏️</button><button class="btn btn-sm btn-delete" onclick="deletarRegistro('${r.id}')">🗑️</button></div></td></tr>`;
+                html += `<tr><td><strong>${r.nf}</strong></td><td>${r.num_pedido || '-'}</td><td>${formatarData(r.dt_pedido)}</td><td>${r.lead_time || '-'}</td><td>${r.cd || '-'}</td><td>${formatarData(r.data_sap)}</td><td>${formatarData(r.data_faturamento)}</td><td>${formatarData(r.data_solicitacao)}</td><td>${formatarData(r.data_agendamento)}</td><td>${formatarData(r.data_reagendamento)}</td><td>${formatarData(r.data_expedicao)}</td><td>${r.transportadora || '-'}</td><td>${r.status || '-'}</td><td>${formatarData(r.data_entrega)}</td><td>${r.observacao || '-'}</td><td><div class="actions"><button class="btn btn-sm btn-rastrear" onclick="rastrear('${r.transportadora}', '${r.nf}')">Rastrear</button><button class="btn btn-sm btn-edit" onclick="abrirEdicao('${r.id}')">✏️</button><button class="btn btn-sm btn-delete" onclick="deletarRegistro('${r.id}')">🗑️</button></div></td></tr>`;
             });
 
             html += '</tbody></table>';
@@ -563,11 +540,12 @@
                     const workbook = XLSX.read(data, { type: 'binary' });
                     console.log('📋 ABAS:', workbook.SheetNames);
 
+                    // Mapeamento simples - todas as abas têm a mesma estrutura agora
                     const abas_config = {
-                        'AMAZON': { rede: 'AMAZON', temCD: false, temSAP: false },
-                        'AMAZON1': { rede: 'AMAZON', temCD: false, temSAP: false },
-                        'SÃO PAULO': { rede: 'SÃO PAULO', temCD: true, temSAP: true },
-                        'PACHECO': { rede: 'PACHECO', temCD: true, temSAP: true }
+                        'AMAZON': 'AMAZON',
+                        'AMAZON1': 'AMAZON',
+                        'SÃO PAULO': 'SÃO PAULO',
+                        'PACHECO': 'PACHECO'
                     };
                     
                     for (const sheet_name of workbook.SheetNames) {
@@ -581,19 +559,16 @@
                         json = json.map(row => {
                             const newRow = {};
                             for (const [key, value] of Object.entries(row)) {
-                                newRow[key.trim()] = value;  // Remove espaços antes e depois
+                                newRow[key.trim()] = value;
                             }
                             return newRow;
                         });
 
-                        const config = abas_config[sheet_name];
+                        const rede = abas_config[sheet_name];
 
                         const registros_aba = json.map(row => {
-                            // Função melhorada para pegar valor
                             const getValor = (coluna) => {
-                                // Tentar o nome exato
                                 if (row[coluna]) return row[coluna];
-                                // Tentar com variações de espaço
                                 for (const key of Object.keys(row)) {
                                     if (key.trim() === coluna.trim() && row[key]) {
                                         return row[key];
@@ -602,17 +577,14 @@
                                 return null;
                             };
 
-                            const nf = getValor('NF') || '';
-                            if (!nf || nf === '') return null;  // Skip se não tiver NF
-
                             return {
-                                rede: config.rede,
+                                rede: rede,
                                 dt_pedido: formatarDataEntrada(getValor('Dt. Pedido')),
                                 lead_time: parseInt(getValor('Lead time')) || null,
-                                cd: config.temCD ? getValor('CD') : null,
-                                data_sap: config.temSAP ? formatarDataEntrada(getValor('Data. SAP')) : null,
+                                cd: getValor('CD'),
+                                data_sap: formatarDataEntrada(getValor('Data. SAP')),
                                 data_faturamento: formatarDataEntrada(getValor('Faturamento')),
-                                nf: nf,
+                                nf: getValor('NF') || null,
                                 num_pedido: getValor('N° do Pedido'),
                                 data_solicitacao: formatarDataEntrada(getValor('Data da Solicitação')),
                                 data_agendamento: formatarDataEntrada(getValor('Data Agendamento')),
@@ -623,10 +595,10 @@
                                 data_entrega: formatarDataEntrada(getValor('Data Entrega')),
                                 observacao: getValor('Observação')
                             };
-                        }).filter(r => r !== null);  // Remove registros sem NF
+                        });
 
                         registrosFormatados = registrosFormatados.concat(registros_aba);
-                        console.log(`   ✅ ${registros_aba.length} registros válidos`);
+                        console.log(`   ✅ ${registros_aba.length} registros importados`);
                     }
 
                     if (registrosFormatados.length === 0) {
