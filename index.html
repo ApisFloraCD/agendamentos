@@ -1413,10 +1413,9 @@
                 return;
             }
 
-            // DEBUG: Mostrar primeiro registro completo
+            // DEBUG: Mostrar primeiro registro completo COM VALORES
             const primeiroRegistro = todosRegistros[0];
-            console.log('🔍 DEBUG - Primeiro registro:', primeiroRegistro);
-            console.log('🔍 Campos disponíveis:', Object.keys(primeiroRegistro));
+            console.log('🔍 DEBUG - Primeiro registro COMPLETO:', primeiroRegistro);
 
             let html = `<div style="background: #f0fdf4; padding: 15px; border-radius: 6px; margin-bottom: 15px; font-size: 13px;">
                 <strong>📊 Total: ${todosRegistros.length} registros</strong>
@@ -1428,6 +1427,17 @@
                     <strong>🔍 Campos encontrados:</strong><br>
                     ${Object.keys(primeiroRegistro).join(', ')}
                 </div>`;
+
+                // Mostrar valores do primeiro registro
+                html += `<div style="background: #fef3c7; padding: 15px; border-radius: 6px; margin-bottom: 15px; font-size: 11px;">
+                    <strong>📋 Valores do 1º registro:</strong><br>
+                    <code style="display: block; margin-top: 10px; word-break: break-all;">`;
+                
+                Object.entries(primeiroRegistro).forEach(([key, value]) => {
+                    html += `${key}: ${value || '(vazio)'}<br>`;
+                });
+                
+                html += `</code></div>`;
             }
 
             html += `<table>
@@ -1437,23 +1447,29 @@
                         <th>Pedido</th>
                         <th>Rede</th>
                         <th>Dt Pedido</th>
+                        <th>Lead Time</th>
+                        <th>CD</th>
+                        <th>Data SAP</th>
+                        <th>Data Faturamento</th>
                         <th>Expedição</th>
-                        <th>Entrega</th>
                         <th>Status</th>
                         <th>Ações</th>
                     </tr>
                 </thead>
                 <tbody>`;
 
-            todosRegistros.slice(0, 100).forEach(r => {
+            todosRegistros.slice(0, 50).forEach(r => {
                 html += `<tr>
-                    <td><strong>${r.nf || r.NF || r.Nf || '-'}</strong></td>
-                    <td>${r.num_pedido || r.Num_Pedido || r.num_Pedido || '-'}</td>
-                    <td>${r.rede || r.Rede || '-'}</td>
-                    <td>${formatarData(r.dt_pedido || r.Dt_Pedido || r.Data_Pedido)}</td>
-                    <td>${formatarData(r.data_expedicao || r.Data_Expedicao || r.Data_Expedição)}</td>
-                    <td>${formatarData(r.data_entrega || r.Data_Entrega)}</td>
-                    <td>${getStatusBadge(r.status || r.Status)}</td>
+                    <td><strong>${r.nf || '-'}</strong></td>
+                    <td>${r.num_pedido || '-'}</td>
+                    <td>${r.rede || '-'}</td>
+                    <td>${formatarData(r.dt_pedido)}</td>
+                    <td>${r.lead_time || '-'}</td>
+                    <td>${r.cd || '-'}</td>
+                    <td>${formatarData(r.data_sap)}</td>
+                    <td>${formatarData(r.data_faturamento)}</td>
+                    <td>${formatarData(r.data_expedicao)}</td>
+                    <td>${getStatusBadge(r.status)}</td>
                     <td>
                         <div class="actions">
                             <button class="btn btn-sm btn-edit" onclick="abrirEdicao('${r.id}')">✏️</button>
