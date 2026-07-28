@@ -572,25 +572,38 @@
                     
                     for (const sheet_name of workbook.SheetNames) {
                         if (!abas_config[sheet_name]) continue;
-                        const json = XLSX.utils.sheet_to_json(workbook.Sheets[sheet_name]);
+                        let json = XLSX.utils.sheet_to_json(workbook.Sheets[sheet_name]);
                         if (json.length === 0) continue;
 
                         console.log(`📥 ${sheet_name}: ${json.length} registros`);
+                        
+                        // NORMALIZAR nomes das colunas (remover espaços extras)
+                        json = json.map(row => {
+                            const newRow = {};
+                            for (const [key, value] of Object.entries(row)) {
+                                newRow[key.trim()] = value;  // Remove espaços antes e depois
+                            }
+                            return newRow;
+                        });
+
                         const config = abas_config[sheet_name];
-                        const headers = Object.keys(json[0]);
 
                         const registros_aba = json.map(row => {
+                            // Função melhorada para pegar valor
                             const getValor = (coluna) => {
-                                // Tentar exato
-                                if (row[coluna] !== undefined && row[coluna] !== null && row[coluna] !== '') return row[coluna];
-                                // Tentar com espaço
-                                if (row[' ' + coluna] !== undefined && row[' ' + coluna] !== null && row[' ' + coluna] !== '') return row[' ' + coluna];
-                                // Tentar normalizando
-                                for (const h of headers) {
-                                    if (h.trim() === coluna && row[h]) return row[h];
+                                // Tentar o nome exato
+                                if (row[coluna]) return row[coluna];
+                                // Tentar com variações de espaço
+                                for (const key of Object.keys(row)) {
+                                    if (key.trim() === coluna.trim() && row[key]) {
+                                        return row[key];
+                                    }
                                 }
                                 return null;
                             };
+
+                            const nf = getValor('NF') || '';
+                            if (!nf || nf === '') return null;  // Skip se não tiver NF
 
                             return {
                                 rede: config.rede,
@@ -599,7 +612,7 @@
                                 cd: config.temCD ? getValor('CD') : null,
                                 data_sap: config.temSAP ? formatarDataEntrada(getValor('Data. SAP')) : null,
                                 data_faturamento: formatarDataEntrada(getValor('Faturamento')),
-                                nf: getValor('NF') || '',
+                                nf: nf,
                                 num_pedido: getValor('N° do Pedido'),
                                 data_solicitacao: formatarDataEntrada(getValor('Data da Solicitação')),
                                 data_agendamento: formatarDataEntrada(getValor('Data Agendamento')),
@@ -610,9 +623,10 @@
                                 data_entrega: formatarDataEntrada(getValor('Data Entrega')),
                                 observacao: getValor('Observação')
                             };
-                        });
+                        }).filter(r => r !== null);  // Remove registros sem NF
 
                         registrosFormatados = registrosFormatados.concat(registros_aba);
+                        console.log(`   ✅ ${registros_aba.length} registros válidos`);
                     }
 
                     if (registrosFormatados.length === 0) {
