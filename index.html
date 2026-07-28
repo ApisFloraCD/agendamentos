@@ -951,7 +951,10 @@
 
         function renderizarTabela(rede, containerId, abaIndex) {
             const container = document.getElementById(containerId);
-            let registros = todosRegistros.filter(r => r.rede === rede);
+            let registros = todosRegistros.filter(r => {
+                const redeDoRegistro = r.rede || r.Rede;
+                return redeDoRegistro === rede;
+            });
 
             const busca = document.getElementById(`buscaNF${abaIndex}`)?.value.toLowerCase() || '';
             const statusFilter = document.getElementById(`filtroStatus${abaIndex}`)?.value || '';
@@ -959,27 +962,39 @@
             const ordenacao = document.getElementById(`ordenacao${abaIndex}`)?.value || 'criado_desc';
 
             if (busca) {
-                registros = registros.filter(r => 
-                    (r.nf && r.nf.toLowerCase().includes(busca)) || 
-                    (r.num_pedido && r.num_pedido.toLowerCase().includes(busca))
-                );
+                registros = registros.filter(r => {
+                    const nf = r.nf || r.NF || r.Nf || '';
+                    const pedido = r.num_pedido || r.Num_Pedido || r.num_Pedido || '';
+                    return nf.toLowerCase().includes(busca) || pedido.toLowerCase().includes(busca);
+                });
             }
 
-            if (statusFilter) registros = registros.filter(r => r.status === statusFilter);
-            if (transpFilter) registros = registros.filter(r => r.transportadora === transpFilter);
+            if (statusFilter) {
+                registros = registros.filter(r => {
+                    const status = r.status || r.Status;
+                    return status === statusFilter;
+                });
+            }
+
+            if (transpFilter) {
+                registros = registros.filter(r => {
+                    const transp = r.transportadora || r.Transportadora;
+                    return transp === transpFilter;
+                });
+            }
 
             registros.sort((a, b) => {
                 switch(ordenacao) {
                     case 'criado_asc':
                         return new Date(a.criado_em) - new Date(b.criado_em);
                     case 'nf_asc':
-                        return (a.nf || '').localeCompare(b.nf || '');
+                        return ((a.nf || a.NF || '') + '').localeCompare((b.nf || b.NF || '') + '');
                     case 'nf_desc':
-                        return (b.nf || '').localeCompare(a.nf || '');
+                        return ((b.nf || b.NF || '') + '').localeCompare((a.nf || a.NF || '') + '');
                     case 'data_exp_asc':
-                        return new Date(a.data_expedicao || 0) - new Date(b.data_expedicao || 0);
+                        return new Date(a.data_expedicao || a.Data_Expedicao || 0) - new Date(b.data_expedicao || b.Data_Expedicao || 0);
                     case 'data_exp_desc':
-                        return new Date(b.data_expedicao || 0) - new Date(a.data_expedicao || 0);
+                        return new Date(b.data_expedicao || b.Data_Expedicao || 0) - new Date(a.data_expedicao || a.Data_Expedicao || 0);
                     default:
                         return new Date(b.criado_em) - new Date(a.criado_em);
                 }
@@ -1020,11 +1035,27 @@
                 <tbody>`;
 
             registros.forEach(r => {
-                const tempoDigitacao = calcularTempo(r.dt_pedido, r.data_sap);
-                const tempoFaturamento = calcularTempo(r.data_sap, r.data_faturamento);
-                const tempoExpedicao = calcularTempo(r.data_faturamento, r.data_expedicao);
-                const tempoAgendamento = calcularTempoAgendamento(r.data_expedicao, r.data_reagendamento, r.data_agendamento);
-                const tempoEntrega = calcularTempo(r.data_expedicao, r.data_entrega);
+                const nf = r.nf || r.NF || r.Nf || '';
+                const pedido = r.num_pedido || r.Num_Pedido || r.num_Pedido || '';
+                const dtPedido = r.dt_pedido || r.Dt_Pedido || r.Data_Pedido;
+                const leadTime = r.lead_time || r.Lead_Time || r.lead_Time;
+                const cd = r.cd || r.CD;
+                const dataSap = r.data_sap || r.Data_SAP || r.Data_Sap;
+                const dataFaturamento = r.data_faturamento || r.Data_Faturamento;
+                const dataSolicitacao = r.data_solicitacao || r.Data_Solicitacao;
+                const dataAgendamento = r.data_agendamento || r.Data_Agendamento;
+                const dataReagendamento = r.data_reagendamento || r.Data_Reagendamento;
+                const dataExpedicao = r.data_expedicao || r.Data_Expedicao || r.Data_Expedição;
+                const transportadora = r.transportadora || r.Transportadora;
+                const status = r.status || r.Status;
+                const dataEntrega = r.data_entrega || r.Data_Entrega;
+                const observacao = r.observacao || r.Observacao;
+
+                const tempoDigitacao = calcularTempo(dtPedido, dataSap);
+                const tempoFaturamento = calcularTempo(dataSap, dataFaturamento);
+                const tempoExpedicao = calcularTempo(dataFaturamento, dataExpedicao);
+                const tempoAgendamento = calcularTempoAgendamento(dataExpedicao, dataReagendamento, dataAgendamento);
+                const tempoEntrega = calcularTempo(dataExpedicao, dataEntrega);
                 
                 let totalLeadTime = '-';
                 if (tempoDigitacao !== '-' && tempoFaturamento !== '-' && tempoExpedicao !== '-' && tempoEntrega !== '-') {
@@ -1035,24 +1066,24 @@
                     totalLeadTime = (tD + tF + tE + tEn) + 'd';
                 }
 
-                const statusBadge = getStatusBadge(r.status);
+                const statusBadge = getStatusBadge(status);
                 
                 html += `<tr>
-                    <td><strong>${r.nf}</strong></td>
-                    <td>${r.num_pedido || '-'}</td>
-                    <td>${formatarData(r.dt_pedido)}</td>
-                    <td>${r.lead_time || '-'}</td>
-                    <td>${r.cd || '-'}</td>
-                    <td>${formatarData(r.data_sap)}</td>
-                    <td>${formatarData(r.data_faturamento)}</td>
-                    <td>${formatarData(r.data_solicitacao)}</td>
-                    <td>${formatarData(r.data_agendamento)}</td>
-                    <td>${formatarData(r.data_reagendamento)}</td>
-                    <td>${formatarData(r.data_expedicao)}</td>
-                    <td>${r.transportadora || '-'}</td>
+                    <td><strong>${nf}</strong></td>
+                    <td>${pedido || '-'}</td>
+                    <td>${formatarData(dtPedido)}</td>
+                    <td>${leadTime || '-'}</td>
+                    <td>${cd || '-'}</td>
+                    <td>${formatarData(dataSap)}</td>
+                    <td>${formatarData(dataFaturamento)}</td>
+                    <td>${formatarData(dataSolicitacao)}</td>
+                    <td>${formatarData(dataAgendamento)}</td>
+                    <td>${formatarData(dataReagendamento)}</td>
+                    <td>${formatarData(dataExpedicao)}</td>
+                    <td>${transportadora || '-'}</td>
                     <td>${statusBadge}</td>
-                    <td>${formatarData(r.data_entrega)}</td>
-                    <td style="max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${r.observacao || ''}">${r.observacao || '-'}</td>
+                    <td>${formatarData(dataEntrega)}</td>
+                    <td style="max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${observacao || ''}">${observacao || '-'}</td>
                     <td class="tempo-cell">${tempoDigitacao}</td>
                     <td class="tempo-cell">${tempoFaturamento}</td>
                     <td class="tempo-cell">${tempoExpedicao}</td>
@@ -1061,7 +1092,7 @@
                     <td class="tempo-cell">${totalLeadTime}</td>
                     <td>
                         <div class="actions">
-                            <button class="btn btn-sm btn-rastrear" onclick="rastrear('${r.transportadora}', '${r.nf}')">Rastrear</button>
+                            <button class="btn btn-sm btn-rastrear" onclick="rastrear('${transportadora}', '${nf}')">Rastrear</button>
                             <button class="btn btn-sm btn-edit" onclick="abrirEdicao('${r.id}')">✏️</button>
                             <button class="btn btn-sm btn-delete" onclick="deletarRegistro('${r.id}')">🗑️</button>
                         </div>
@@ -1382,10 +1413,24 @@
                 return;
             }
 
+            // DEBUG: Mostrar primeiro registro completo
+            const primeiroRegistro = todosRegistros[0];
+            console.log('🔍 DEBUG - Primeiro registro:', primeiroRegistro);
+            console.log('🔍 Campos disponíveis:', Object.keys(primeiroRegistro));
+
             let html = `<div style="background: #f0fdf4; padding: 15px; border-radius: 6px; margin-bottom: 15px; font-size: 13px;">
                 <strong>📊 Total: ${todosRegistros.length} registros</strong>
-            </div>
-            <table>
+            </div>`;
+
+            // Mostrar os campos disponíveis
+            if (primeiroRegistro) {
+                html += `<div style="background: #dbeafe; padding: 15px; border-radius: 6px; margin-bottom: 15px; font-size: 12px;">
+                    <strong>🔍 Campos encontrados:</strong><br>
+                    ${Object.keys(primeiroRegistro).join(', ')}
+                </div>`;
+            }
+
+            html += `<table>
                 <thead>
                     <tr>
                         <th>NF</th>
@@ -1400,15 +1445,15 @@
                 </thead>
                 <tbody>`;
 
-            todosRegistros.forEach(r => {
+            todosRegistros.slice(0, 100).forEach(r => {
                 html += `<tr>
-                    <td><strong>${r.nf}</strong></td>
-                    <td>${r.num_pedido || '-'}</td>
-                    <td>${r.rede || '-'}</td>
-                    <td>${formatarData(r.dt_pedido)}</td>
-                    <td>${formatarData(r.data_expedicao)}</td>
-                    <td>${formatarData(r.data_entrega)}</td>
-                    <td>${getStatusBadge(r.status)}</td>
+                    <td><strong>${r.nf || r.NF || r.Nf || '-'}</strong></td>
+                    <td>${r.num_pedido || r.Num_Pedido || r.num_Pedido || '-'}</td>
+                    <td>${r.rede || r.Rede || '-'}</td>
+                    <td>${formatarData(r.dt_pedido || r.Dt_Pedido || r.Data_Pedido)}</td>
+                    <td>${formatarData(r.data_expedicao || r.Data_Expedicao || r.Data_Expedição)}</td>
+                    <td>${formatarData(r.data_entrega || r.Data_Entrega)}</td>
+                    <td>${getStatusBadge(r.status || r.Status)}</td>
                     <td>
                         <div class="actions">
                             <button class="btn btn-sm btn-edit" onclick="abrirEdicao('${r.id}')">✏️</button>
