@@ -4,9 +4,7 @@ Sistema de agendamento de expedição para gerenciar entregas das principais red
 
 ## 🚀 Acesso Rápido
 
-**URL de Acesso:** https://ApisFloraCom.github.io/agendamentos/
-
-*(Atualize a URL com seu usuário do GitHub)*
+**URL de Acesso:** https://ApisFloraCD.github.io/agendamentos/
 
 ## ✨ Funcionalidades
 
@@ -96,32 +94,11 @@ Cada agendamento contém:
 ✅ Tablet (iPad, Android Tablets)
 ✅ Celular (iPhone, Android)
 
-## 🛠️ Troubleshooting
-
-### "Configure o Supabase primeiro"
-- Verifique se preencheu URL e Chave corretamente
-- Clique em Salvar Configuração
-- Atualize a página
-
-### "Erro ao salvar"
-- Verifique internet
-- Confirme que a URL e Chave do Supabase estão corretas
-- Tente novamente
-
-### Dados não aparecem
-- Aguarde 30 segundos (sincronização)
-- Atualize a página
-- Verifique se o Supabase tem dados na tabela
-
 ## 👥 Compartilhar com o Time
 
-Basta enviar o link: **https://ApisFloraCom.github.io/agendamentos/**
+Basta enviar o link: **https://ApisFloraCD.github.io/agendamentos/**
 
 Todos os usuários veem os mesmos dados em tempo real!
-
-## 📞 Suporte
-
-Para problemas ou sugestões, entre em contato com Rhuan.
 
 ---
 
