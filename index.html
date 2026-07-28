@@ -203,7 +203,7 @@
                 <div class="filters">
                     <div class="filter-title">🔍 Filtros Avançados</div>
                     <div class="filter-grid">
-                        <div class="filter-group"><label>Buscar NF/Pedido</label><input type="text" id="buscaNF2" placeholder="Digite NF ou pedido..." onchange="filtrarTabela(2)"></div>
+                        <div class="filter-group"><label>Buscar NF/Pedido</label><input type="text" id="buscaNF2" placeholder="Digite NF ou pedido..." onkeyup="filtrarTabela(2)"></div>
                         <div class="filter-group"><label>Status</label><select id="filtroStatus2" onchange="filtrarTabela(2)"><option value="">Todos</option><option value="ENTREGUE">ENTREGUE</option><option value="EM ROTA">EM ROTA</option><option value="ENTREGA AGENDADA">ENTREGA AGENDADA</option><option value="AGUARDANDO AGENDAMENTO">AGUARDANDO AGENDAMENTO</option><option value="CANCELADO">CANCELADO</option></select></div>
                         <div class="filter-group"><label>Tipo</label><select id="filtroTipo2" onchange="filtrarTabela(2)"><option value="">Todos</option><option value="nao_entregues">Não entregues ainda</option><option value="atrasados">Atrasados</option><option value="entrega_hoje">Entrega hoje</option></select></div>
                         <div class="filter-group"><label>Transportadora</label><select id="filtroTransp2" onchange="filtrarTabela(2)"><option value="">Todos</option></select></div>
@@ -218,7 +218,7 @@
                 <div class="filters">
                     <div class="filter-title">🔍 Filtros Avançados</div>
                     <div class="filter-grid">
-                        <div class="filter-group"><label>Buscar NF/Pedido</label><input type="text" id="buscaNF3" placeholder="Digite NF ou pedido..." onchange="filtrarTabela(3)"></div>
+                        <div class="filter-group"><label>Buscar NF/Pedido</label><input type="text" id="buscaNF3" placeholder="Digite NF ou pedido..." onkeyup="filtrarTabela(3)"></div>
                         <div class="filter-group"><label>Status</label><select id="filtroStatus3" onchange="filtrarTabela(3)"><option value="">Todos</option><option value="ENTREGUE">ENTREGUE</option><option value="EM ROTA">EM ROTA</option><option value="ENTREGA AGENDADA">ENTREGA AGENDADA</option><option value="AGUARDANDO AGENDAMENTO">AGUARDANDO AGENDAMENTO</option><option value="CANCELADO">CANCELADO</option></select></div>
                         <div class="filter-group"><label>Tipo</label><select id="filtroTipo3" onchange="filtrarTabela(3)"><option value="">Todos</option><option value="nao_entregues">Não entregues ainda</option><option value="atrasados">Atrasados</option><option value="entrega_hoje">Entrega hoje</option></select></div>
                         <div class="filter-group"><label>Transportadora</label><select id="filtroTransp3" onchange="filtrarTabela(3)"><option value="">Todos</option></select></div>
@@ -233,7 +233,7 @@
                 <div class="filters">
                     <div class="filter-title">🔍 Filtros Avançados</div>
                     <div class="filter-grid">
-                        <div class="filter-group"><label>Buscar NF/Pedido</label><input type="text" id="buscaNF4" placeholder="Digite NF ou pedido..." onchange="filtrarTabela(4)"></div>
+                        <div class="filter-group"><label>Buscar NF/Pedido</label><input type="text" id="buscaNF4" placeholder="Digite NF ou pedido..." onkeyup="filtrarTabela(4)"></div>
                         <div class="filter-group"><label>Status</label><select id="filtroStatus4" onchange="filtrarTabela(4)"><option value="">Todos</option><option value="ENTREGUE">ENTREGUE</option><option value="EM ROTA">EM ROTA</option><option value="ENTREGA AGENDADA">ENTREGA AGENDADA</option><option value="AGUARDANDO AGENDAMENTO">AGUARDANDO AGENDAMENTO</option><option value="CANCELADO">CANCELADO</option></select></div>
                         <div class="filter-group"><label>Tipo</label><select id="filtroTipo4" onchange="filtrarTabela(4)"><option value="">Todos</option><option value="nao_entregues">Não entregues ainda</option><option value="atrasados">Atrasados</option><option value="entrega_hoje">Entrega hoje</option></select></div>
                         <div class="filter-group"><label>Transportadora</label><select id="filtroTransp4" onchange="filtrarTabela(4)"><option value="">Todos</option></select></div>
@@ -326,6 +326,7 @@
         let registroEmEdicao = null;
         let transportadoras = {};
         let chartsInstances = {};
+        let debounceTimers = {};
 
         // Inicializar
         window.addEventListener('load', () => {
@@ -611,8 +612,24 @@
         }
 
         function filtrarTabela(abaIndex) {
-            const redes = ['', 'AMAZON', 'SÃO PAULO', 'PACHECO'];
-            renderizarTabela(redes[abaIndex], ['', 'tabelaAmazon', 'tabelaSaoPaulo', 'tabelaPacheco'][abaIndex], abaIndex);
+            const containerId = ['', 'tabelaAmazon', 'tabelaSaoPaulo', 'tabelaPacheco'][abaIndex];
+            
+            // Limpar timer anterior
+            if (debounceTimers[abaIndex]) {
+                clearTimeout(debounceTimers[abaIndex]);
+            }
+            
+            // Mostrar "Carregando..." imediatamente
+            const container = document.getElementById(containerId);
+            if (container) {
+                container.innerHTML = '<div class="empty-state">⏳ Carregando...</div>';
+            }
+            
+            // Esperar 300ms e depois renderizar
+            debounceTimers[abaIndex] = setTimeout(() => {
+                const redes = ['', 'AMAZON', 'SÃO PAULO', 'PACHECO'];
+                renderizarTabela(redes[abaIndex], containerId, abaIndex);
+            }, 300);
         }
 
         function renderizarTabela(rede, containerId, abaIndex) {
@@ -695,7 +712,7 @@
             }
 
             const totalRegistros = registros.length;
-            const limite = 200;  // Mostrar apenas 200 por vez
+            const limite = 50;  // Mostrar apenas 50 por vez
             const registrosMostrados = registros.slice(0, limite);
 
             const colunas = ['nf', 'num_pedido', 'dt_pedido', 'lead_time', 'cd', 'data_sap', 'data_faturamento', 'data_solicitacao', 'data_agendamento', 'data_reagendamento', 'data_expedicao', 'transportadora', 'status', 'data_entrega', 'observacao'];
@@ -703,8 +720,8 @@
             const widths = ['80px', '80px', '85px', '70px', '60px', '85px', '85px', '85px', '85px', '85px', '85px', '130px', '130px', '85px', '100px'];
 
             let html = `<div style="background: #f0fdf4; padding: 10px 15px; border-radius: 6px; margin-bottom: 15px; font-size: 12px; color: #065f46;">
-                <strong>📊 ${registrosMostrados.length} de ${totalRegistros} registros</strong>
-                ${totalRegistros > limite ? ` (mostrando os primeiros ${limite})` : ''}
+                <strong>📊 Mostrando ${registrosMostrados.length} de ${totalRegistros}</strong>
+                ${totalRegistros > limite ? ` (use filtros para refinar)` : ''}
             </div>`;
 
             html += `<table style="width: 100%;"><thead><tr>`;
@@ -734,15 +751,6 @@
             });
 
             html += '</tbody></table>';
-            
-            if (totalRegistros > limite) {
-                html += `<div style="text-align: center; padding: 20px;">
-                    <div style="background: #fff3cd; padding: 10px; border-radius: 6px; margin-bottom: 10px; font-size: 12px; color: #856404;">
-                        ℹ️ Mostrando ${limite} de ${totalRegistros} registros para melhor performance. Use os filtros para refinar a busca.
-                    </div>
-                </div>`;
-            }
-
             container.innerHTML = html;
         }
 
