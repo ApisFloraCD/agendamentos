@@ -1283,36 +1283,17 @@
                         return;
                     }
 
-                    const registrosFormatados = jsonData.map(row => ({
-                        rede: row.Rede || row.rede || '',
-                        dt_pedido: formatarDataEntrada(row['Data do Pedido'] || row.dt_pedido),
-                        lead_time: parseInt(row['Lead time'] || row.lead_time) || null,
-                        cd: row.CD || row.cd || null,
-                        data_sap: formatarDataEntrada(row['Data SAP'] || row.data_sap),
-                        data_faturamento: formatarDataEntrada(row['Data Faturamento'] || row.data_faturamento),
-                        nf: row.NF || row.nf || row['Nº NF'] || '',
-                        num_pedido: row['Nº Pedido'] || row.num_pedido || null,
-                        data_solicitacao: formatarDataEntrada(row['Data Solicitação'] || row.data_solicitacao),
-                        data_agendamento: formatarDataEntrada(row['Data Agendamento'] || row.data_agendamento),
-                        data_reagendamento: formatarDataEntrada(row['Data Reagendamento'] || row.data_reagendamento),
-                        data_expedicao: formatarDataEntrada(row['Data Expedição'] || row.data_expedicao),
-                        transportadora: row.Transportadora || row.transportadora || null,
-                        status: row.Status || row.status || null,
-                        data_entrega: formatarDataEntrada(row['Data Entrega'] || row.data_entrega),
-                        observacao: row.Observação || row.observacao || null
-                    }));
+                    // DEBUG: Mostrar nomes das colunas da planilha
+                    console.log('📋 COLUNAS DA PLANILHA:', Object.keys(jsonData[0]));
+                    console.log('📋 PRIMEIRO REGISTRO:', jsonData[0]);
 
-                    if (!sbClient) {
-                        mostrarToast('Configure Supabase na aba Config', 'error');
-                        return;
-                    }
+                    // Criar alertinha mostrando as colunas
+                    const colunasEncontradas = Object.keys(jsonData[0]).join(', ');
+                    alert(`🔍 COLUNAS ENCONTRADAS:\n\n${colunasEncontradas}\n\nVerifique o Console (F12) para detalhes.`);
 
-                    const { error } = await sbClient.from('agendamentos').upsert(registrosFormatados);
-                    if (error) throw error;
+                    // Placeholder - não processar ainda enquanto não mapear corretamente
+                    return;
 
-                    mostrarToast(`${registrosFormatados.length} registros importados e sincronizados!`, 'success');
-                    carregarTodos();
-                    document.getElementById('fileInput').value = '';
                 } catch (err) {
                     mostrarToast('Erro ao importar: ' + err.message, 'error');
                 }
