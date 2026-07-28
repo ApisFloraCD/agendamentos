@@ -15,33 +15,29 @@
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: #f5f5f5;
-            min-height: 100vh;
-            padding: 20px;
         }
 
         .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            overflow: hidden;
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
         .header {
             background: linear-gradient(135deg, #0a3922 0%, #0b6136 100%);
             color: white;
-            padding: 30px;
+            padding: 25px;
             text-align: center;
         }
 
         .header h1 {
-            font-size: 28px;
+            font-size: 26px;
             margin-bottom: 5px;
         }
 
         .header p {
-            font-size: 14px;
+            font-size: 13px;
             opacity: 0.9;
         }
 
@@ -49,26 +45,23 @@
             display: flex;
             background: white;
             border-bottom: 2px solid #e0e0e0;
-            flex-wrap: wrap;
-            padding: 0;
+            padding: 0 25px;
+            overflow-x: auto;
         }
 
         .tab-btn {
-            flex: 1;
-            min-width: 100px;
-            padding: 15px 20px;
-            background: white;
+            padding: 12px 20px;
+            background: none;
             border: none;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
             color: #333;
-            transition: all 0.3s;
             border-bottom: 3px solid transparent;
+            white-space: nowrap;
         }
 
         .tab-btn:hover {
-            background: #f9f9f9;
             color: #0b6136;
         }
 
@@ -77,8 +70,13 @@
             border-bottom-color: #0b6136;
         }
 
+        .main-content {
+            flex: 1;
+            padding: 25px;
+            overflow-y: auto;
+        }
+
         .content {
-            padding: 30px;
             display: none;
         }
 
@@ -87,13 +85,15 @@
         }
 
         .form-container {
-            background: #f9f9f9;
+            background: white;
             padding: 25px;
             border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 25px;
         }
 
         .form-title {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 700;
             margin-bottom: 20px;
             color: #0a3922;
@@ -101,8 +101,8 @@
 
         .form-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 15px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
             margin-bottom: 20px;
         }
 
@@ -114,17 +114,17 @@
         .form-group label {
             font-weight: 600;
             color: #333;
-            margin-bottom: 6px;
-            font-size: 13px;
+            margin-bottom: 5px;
+            font-size: 12px;
         }
 
         .form-group input,
         .form-group select,
         .form-group textarea {
-            padding: 10px 12px;
+            padding: 8px 10px;
             border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 13px;
+            border-radius: 4px;
+            font-size: 12px;
         }
 
         .form-group input:focus,
@@ -132,35 +132,56 @@
         .form-group textarea:focus {
             outline: none;
             border-color: #0b6136;
-            box-shadow: 0 0 0 3px rgba(11, 97, 54, 0.1);
+            box-shadow: 0 0 0 2px rgba(11, 97, 54, 0.1);
         }
 
         .btn {
-            padding: 12px 24px;
+            padding: 8px 16px;
             border: none;
-            border-radius: 6px;
+            border-radius: 4px;
             font-weight: 600;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 12px;
         }
 
         .btn-primary {
             background: #0b6136;
             color: white;
             width: 100%;
-            padding: 14px;
+            padding: 10px;
         }
 
         .btn-primary:hover {
             background: #0a3922;
         }
 
+        .btn-sm {
+            padding: 4px 8px;
+            font-size: 11px;
+        }
+
+        .btn-edit {
+            background: #3b82f6;
+            color: white;
+            margin-right: 5px;
+        }
+
+        .btn-delete {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-rastrear {
+            background: #0b6136;
+            color: white;
+        }
+
         .message {
             padding: 12px 16px;
-            border-radius: 6px;
+            border-radius: 4px;
             margin-bottom: 20px;
             display: none;
-            font-size: 14px;
+            font-size: 13px;
         }
 
         .message.show {
@@ -179,47 +200,83 @@
             border-left: 4px solid #ef4444;
         }
 
-        .config-section {
-            background: #f9f9f9;
-            padding: 20px;
+        .filters {
+            background: white;
+            padding: 15px;
             border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
 
-        .config-section h3 {
+        .filter-title {
+            font-weight: 700;
             color: #0a3922;
+            margin-bottom: 12px;
+            font-size: 13px;
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
             margin-bottom: 15px;
         }
 
-        .config-item {
-            margin-bottom: 20px;
+        .filter-group {
+            display: flex;
+            flex-direction: column;
         }
 
-        .config-item input {
-            width: 100%;
-            padding: 10px;
+        .filter-group label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+            font-size: 12px;
+        }
+
+        .filter-group input,
+        .filter-group select {
+            padding: 6px 8px;
             border: 1px solid #ddd;
-            border-radius: 6px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            overflow-x: auto;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 13px;
+            font-size: 12px;
         }
 
         thead {
             background: #0a3922;
             color: white;
+            position: sticky;
+            top: 0;
         }
 
         th {
-            padding: 12px 8px;
+            padding: 12px;
             text-align: left;
             font-weight: 600;
+            border-bottom: 1px solid #ddd;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        th:hover {
+            background: #0b6136;
         }
 
         tbody tr {
-            border-bottom: 1px solid #ddd;
+            border-bottom: 1px solid #eee;
         }
 
         tbody tr:hover {
@@ -227,23 +284,135 @@
         }
 
         td {
-            padding: 10px 8px;
+            padding: 10px 12px;
         }
 
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: #999;
+        .actions {
+            display: flex;
+            gap: 5px;
+            white-space: nowrap;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            max-width: 900px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #0a3922;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-cancel {
+            background: #e0e0e0;
+            color: #333;
+            flex: 1;
+        }
+
+        .btn-save {
+            background: #0b6136;
+            color: white;
+            flex: 1;
         }
 
         .status-badge {
             display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 11px;
+            padding: 4px 8px;
+            border-radius: 4px;
             font-weight: 600;
-            background: #e0e0e0;
-            color: #333;
+            font-size: 11px;
+        }
+
+        .status-entregue {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-em-rota {
+            background: #dbeafe;
+            color: #0c4a6e;
+        }
+
+        .status-agendado {
+            background: #fef3c7;
+            color: #78350f;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .config-section {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .import-zone {
+            border: 2px dashed #0b6136;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .import-zone.dragover {
+            background: #f0fdf4;
+        }
+
+        .import-zone input[type="file"] {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 15px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .table-container {
+                font-size: 11px;
+            }
+
+            td, th {
+                padding: 8px;
+            }
         }
     </style>
 </head>
@@ -262,146 +431,279 @@
             <button class="tab-btn" onclick="mudarAba(2)">📍 São Paulo</button>
             <button class="tab-btn" onclick="mudarAba(3)">📦 Pacheco</button>
             <button class="tab-btn" onclick="mudarAba(4)">🔍 Pesquisa</button>
-            <button class="tab-btn" onclick="mudarAba(5)">⚙️ Config</button>
+            <button class="tab-btn" onclick="mudarAba(5)">📥 Importar</button>
+            <button class="tab-btn" onclick="mudarAba(6)">⚙️ Config</button>
         </div>
 
-        <!-- ABA 0: ENTRADA -->
-        <div class="content active" id="aba-0">
-            <div class="form-container">
-                <div class="form-title">Lançamento de Novo Agendamento</div>
-                
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label>Rede de Destino *</label>
-                        <select id="rede">
-                            <option value="">-- Selecione --</option>
-                            <option value="AMAZON">AMAZON</option>
-                            <option value="SÃO PAULO">SÃO PAULO</option>
-                            <option value="PACHECO">PACHECO</option>
-                        </select>
+        <div class="main-content">
+            <!-- ABA 0: ENTRADA -->
+            <div class="content active" id="aba-0">
+                <div class="form-container">
+                    <div class="form-title">Lançamento de Novo Agendamento</div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Rede</label>
+                            <select id="rede">
+                                <option value="">-- Selecione --</option>
+                                <option value="AMAZON">AMAZON</option>
+                                <option value="SÃO PAULO">SÃO PAULO</option>
+                                <option value="PACHECO">PACHECO</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Data do Pedido</label>
+                            <input type="date" id="dtPedido">
+                        </div>
+                        <div class="form-group">
+                            <label>Lead time (dias)</label>
+                            <input type="number" id="leadTime" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label>CD</label>
+                            <input type="text" id="cd">
+                        </div>
+                        <div class="form-group">
+                            <label>Data SAP</label>
+                            <input type="date" id="dataSap">
+                        </div>
+                        <div class="form-group">
+                            <label>Data Faturamento</label>
+                            <input type="date" id="dataFaturamento">
+                        </div>
+                        <div class="form-group">
+                            <label>NF</label>
+                            <input type="text" id="nf">
+                        </div>
+                        <div class="form-group">
+                            <label>Nº Pedido</label>
+                            <input type="text" id="numPedido">
+                        </div>
+                        <div class="form-group">
+                            <label>Data Solicitação</label>
+                            <input type="date" id="dataSolicitacao">
+                        </div>
+                        <div class="form-group">
+                            <label>Data Agendamento</label>
+                            <input type="date" id="dataAgendamento">
+                        </div>
+                        <div class="form-group">
+                            <label>Data Reagendamento</label>
+                            <input type="date" id="dataReagendamento">
+                        </div>
+                        <div class="form-group">
+                            <label>Data Expedição</label>
+                            <input type="date" id="dataExpedicao">
+                        </div>
+                        <div class="form-group">
+                            <label>Transportadora</label>
+                            <select id="transportadora">
+                                <option value="">-- Selecione --</option>
+                                <option value="ATIVA">ATIVA</option>
+                                <option value="BRASPRESS">BRASPRESS</option>
+                                <option value="TROCA">TROCA</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Status</label>
+                            <select id="status">
+                                <option value="">-- Selecione --</option>
+                                <option value="ENTREGUE">ENTREGUE</option>
+                                <option value="EM ROTA">EM ROTA</option>
+                                <option value="ENTREGA AGENDADA">ENTREGA AGENDADA</option>
+                                <option value="AGUARDANDO AGENDAMENTO">AGUARDANDO AGENDAMENTO</option>
+                                <option value="CANCELADO">CANCELADO</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Data Entrega</label>
+                            <input type="date" id="dataEntrega">
+                        </div>
+                        <div class="form-group" style="grid-column: 1/-1;">
+                            <label>Observação</label>
+                            <textarea id="observacao" style="resize: vertical; min-height: 60px;"></textarea>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label>Data do Pedido *</label>
-                        <input type="date" id="dtPedido">
-                    </div>
-                    <div class="form-group">
-                        <label>Lead time (dias)</label>
-                        <input type="number" id="leadTime" min="0">
-                    </div>
-                    <div class="form-group">
-                        <label>CD</label>
-                        <input type="text" id="cd">
-                    </div>
-                    <div class="form-group">
-                        <label>Data SAP *</label>
-                        <input type="date" id="dataSap">
-                    </div>
-                    <div class="form-group">
-                        <label>Data Faturamento *</label>
-                        <input type="date" id="dataFaturamento">
-                    </div>
-                    <div class="form-group">
-                        <label>NF (Nota Fiscal) *</label>
-                        <input type="text" id="nf">
-                    </div>
-                    <div class="form-group">
-                        <label>Nº Pedido</label>
-                        <input type="text" id="numPedido">
-                    </div>
-                    <div class="form-group">
-                        <label>Data Solicitação</label>
-                        <input type="date" id="dataSolicitacao">
-                    </div>
-                    <div class="form-group">
-                        <label>Data Agendamento</label>
-                        <input type="date" id="dataAgendamento">
-                    </div>
-                    <div class="form-group">
-                        <label>Data Reagendamento</label>
-                        <input type="date" id="dataReagendamento">
-                    </div>
-                    <div class="form-group">
-                        <label>Data Expedição *</label>
-                        <input type="date" id="dataExpedicao">
-                    </div>
-                    <div class="form-group">
-                        <label>Transportadora</label>
-                        <select id="transportadora">
-                            <option value="">-- Selecione --</option>
-                            <option value="ATIVA">ATIVA</option>
-                            <option value="BRASPRESS">BRASPRESS</option>
-                            <option value="TROCA">TROCA</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Status</label>
-                        <select id="status">
-                            <option value="">-- Selecione --</option>
-                            <option value="ENTREGUE">ENTREGUE</option>
-                            <option value="EM ROTA">EM ROTA</option>
-                            <option value="ENTREGA AGENDADA">ENTREGA AGENDADA</option>
-                            <option value="AGUARDANDO AGENDAMENTO">AGUARDANDO AGENDAMENTO</option>
-                            <option value="CANCELADO">CANCELADO</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Data Entrega</label>
-                        <input type="date" id="dataEntrega">
-                    </div>
-                    <div class="form-group" style="grid-column: 1/-1;">
-                        <label>Observação</label>
-                        <textarea id="observacao" style="resize: vertical; min-height: 70px;"></textarea>
-                    </div>
+                    <button class="btn btn-primary" onclick="salvarAgendamento()">💾 Salvar Agendamento</button>
                 </div>
-                <button class="btn btn-primary" onclick="salvarAgendamento()">💾 Salvar Agendamento</button>
             </div>
-        </div>
 
-        <!-- ABA 1: AMAZON -->
-        <div class="content" id="aba-1">
-            <h2>Agendamentos Amazon</h2>
-            <div id="tabelaAmazon"><p style="color: #999;">Configure Supabase na aba Config e salve agendamentos</p></div>
-        </div>
-
-        <!-- ABA 2: SÃO PAULO -->
-        <div class="content" id="aba-2">
-            <h2>Agendamentos São Paulo</h2>
-            <div id="tabelaSaoPaulo"><p style="color: #999;">Configure Supabase na aba Config e salve agendamentos</p></div>
-        </div>
-
-        <!-- ABA 3: PACHECO -->
-        <div class="content" id="aba-3">
-            <h2>Agendamentos Pacheco</h2>
-            <div id="tabelaPacheco"><p style="color: #999;">Configure Supabase na aba Config e salve agendamentos</p></div>
-        </div>
-
-        <!-- ABA 4: PESQUISA -->
-        <div class="content" id="aba-4">
-            <input type="text" id="searchInput" placeholder="🔍 Digite NF ou Nº do Pedido..." style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 20px;">
-            <div id="searchResults"></div>
-        </div>
-
-        <!-- ABA 5: CONFIG -->
-        <div class="content" id="aba-5">
-            <div class="config-section">
-                <h3>⚙️ Configuração do Supabase</h3>
-                
-                <div class="config-item">
-                    <label><strong>URL do Supabase</strong></label>
-                    <input type="text" id="supabaseUrl" placeholder="https://seu-projeto.supabase.co">
+            <!-- ABA 1, 2, 3: TABELAS POR REDE -->
+            <div class="content" id="aba-1">
+                <div class="filters">
+                    <div class="filter-title">🔍 Filtros e Busca</div>
+                    <div class="filter-grid">
+                        <div class="filter-group">
+                            <label>Buscar NF/Pedido</label>
+                            <input type="text" id="buscaNF1" placeholder="Digite NF ou pedido..." onkeyup="filtrarTabela(1)">
+                        </div>
+                        <div class="filter-group">
+                            <label>Status</label>
+                            <select id="filtroStatus1" onchange="filtrarTabela(1)">
+                                <option value="">Todos</option>
+                                <option value="ENTREGUE">ENTREGUE</option>
+                                <option value="EM ROTA">EM ROTA</option>
+                                <option value="ENTREGA AGENDADA">ENTREGA AGENDADA</option>
+                                <option value="AGUARDANDO AGENDAMENTO">AGUARDANDO AGENDAMENTO</option>
+                                <option value="CANCELADO">CANCELADO</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Transportadora</label>
+                            <select id="filtroTransp1" onchange="filtrarTabela(1)">
+                                <option value="">Todos</option>
+                                <option value="ATIVA">ATIVA</option>
+                                <option value="BRASPRESS">BRASPRESS</option>
+                                <option value="TROCA">TROCA</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Ordenar por</label>
+                            <select id="ordenacao1" onchange="filtrarTabela(1)">
+                                <option value="criado_desc">Mais recentes</option>
+                                <option value="criado_asc">Mais antigos</option>
+                                <option value="nf_asc">NF (A-Z)</option>
+                                <option value="nf_desc">NF (Z-A)</option>
+                                <option value="data_exp_asc">Expedição (Crescente)</option>
+                                <option value="data_exp_desc">Expedição (Decrescente)</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
+                <div class="table-container" id="tabelaAmazon"></div>
+            </div>
 
-                <div class="config-item">
-                    <label><strong>Chave Anon do Supabase</strong></label>
-                    <input type="password" id="supabaseKey" placeholder="eyJhbGc...">
+            <div class="content" id="aba-2">
+                <div class="filters">
+                    <div class="filter-title">🔍 Filtros e Busca</div>
+                    <div class="filter-grid">
+                        <div class="filter-group">
+                            <label>Buscar NF/Pedido</label>
+                            <input type="text" id="buscaNF2" placeholder="Digite NF ou pedido..." onkeyup="filtrarTabela(2)">
+                        </div>
+                        <div class="filter-group">
+                            <label>Status</label>
+                            <select id="filtroStatus2" onchange="filtrarTabela(2)">
+                                <option value="">Todos</option>
+                                <option value="ENTREGUE">ENTREGUE</option>
+                                <option value="EM ROTA">EM ROTA</option>
+                                <option value="ENTREGA AGENDADA">ENTREGA AGENDADA</option>
+                                <option value="AGUARDANDO AGENDAMENTO">AGUARDANDO AGENDAMENTO</option>
+                                <option value="CANCELADO">CANCELADO</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Transportadora</label>
+                            <select id="filtroTransp2" onchange="filtrarTabela(2)">
+                                <option value="">Todos</option>
+                                <option value="ATIVA">ATIVA</option>
+                                <option value="BRASPRESS">BRASPRESS</option>
+                                <option value="TROCA">TROCA</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Ordenar por</label>
+                            <select id="ordenacao2" onchange="filtrarTabela(2)">
+                                <option value="criado_desc">Mais recentes</option>
+                                <option value="criado_asc">Mais antigos</option>
+                                <option value="nf_asc">NF (A-Z)</option>
+                                <option value="nf_desc">NF (Z-A)</option>
+                                <option value="data_exp_asc">Expedição (Crescente)</option>
+                                <option value="data_exp_desc">Expedição (Decrescente)</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
+                <div class="table-container" id="tabelaSaoPaulo"></div>
+            </div>
 
-                <button class="btn btn-primary" onclick="salvarConfig()">Salvar Configuração</button>
+            <div class="content" id="aba-3">
+                <div class="filters">
+                    <div class="filter-title">🔍 Filtros e Busca</div>
+                    <div class="filter-grid">
+                        <div class="filter-group">
+                            <label>Buscar NF/Pedido</label>
+                            <input type="text" id="buscaNF3" placeholder="Digite NF ou pedido..." onkeyup="filtrarTabela(3)">
+                        </div>
+                        <div class="filter-group">
+                            <label>Status</label>
+                            <select id="filtroStatus3" onchange="filtrarTabela(3)">
+                                <option value="">Todos</option>
+                                <option value="ENTREGUE">ENTREGUE</option>
+                                <option value="EM ROTA">EM ROTA</option>
+                                <option value="ENTREGA AGENDADA">ENTREGA AGENDADA</option>
+                                <option value="AGUARDANDO AGENDAMENTO">AGUARDANDO AGENDAMENTO</option>
+                                <option value="CANCELADO">CANCELADO</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Transportadora</label>
+                            <select id="filtroTransp3" onchange="filtrarTabela(3)">
+                                <option value="">Todos</option>
+                                <option value="ATIVA">ATIVA</option>
+                                <option value="BRASPRESS">BRASPRESS</option>
+                                <option value="TROCA">TROCA</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Ordenar por</label>
+                            <select id="ordenacao3" onchange="filtrarTabela(3)">
+                                <option value="criado_desc">Mais recentes</option>
+                                <option value="criado_asc">Mais antigos</option>
+                                <option value="nf_asc">NF (A-Z)</option>
+                                <option value="nf_desc">NF (Z-A)</option>
+                                <option value="data_exp_asc">Expedição (Crescente)</option>
+                                <option value="data_exp_desc">Expedição (Decrescente)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-container" id="tabelaPacheco"></div>
+            </div>
 
-                <div style="margin-top: 30px; background: white; padding: 20px; border-radius: 8px;">
-                    <h4>Links de Rastreamento:</h4>
-                    <ul style="margin-left: 20px; margin-top: 10px; font-size: 13px;">
-                        <li><strong>ATIVA:</strong> https://ativalog.com.br/area-do-cliente/</li>
+            <!-- ABA 4: PESQUISA -->
+            <div class="content" id="aba-4">
+                <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    <input type="text" id="searchInput" placeholder="🔍 Digite NF ou Nº do Pedido..." style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px;">
+                </div>
+                <div class="table-container" id="searchResults"></div>
+            </div>
+
+            <!-- ABA 5: IMPORTAR -->
+            <div class="content" id="aba-5">
+                <div class="form-container">
+                    <div class="form-title">📥 Importar Dados da Planilha</div>
+                    <p style="color: #666; margin-bottom: 20px; font-size: 13px;">Importe dados de sua planilha Excel/CSV anterior. Formatos aceitos: .xlsx, .csv</p>
+                    
+                    <div class="import-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+                        <div style="font-size: 30px; margin-bottom: 10px;">📄</div>
+                        <div style="font-weight: 600; color: #0a3922; margin-bottom: 5px;">Clique ou arraste arquivos aqui</div>
+                        <div style="font-size: 12px; color: #999;">Aceita: .xlsx, .csv, .xls</div>
+                        <input type="file" id="fileInput" accept=".xlsx,.csv,.xls" onchange="importarArquivo(event)">
+                    </div>
+
+                    <div id="importStatus"></div>
+                </div>
+            </div>
+
+            <!-- ABA 6: CONFIG -->
+            <div class="content" id="aba-6">
+                <div class="config-section">
+                    <div class="form-title">⚙️ Configuração do Supabase</div>
+                    <div class="form-grid">
+                        <div class="form-group" style="grid-column: 1/-1;">
+                            <label>URL do Supabase</label>
+                            <input type="text" id="supabaseUrl" placeholder="https://seu-projeto.supabase.co">
+                        </div>
+                        <div class="form-group" style="grid-column: 1/-1;">
+                            <label>Chave Anon do Supabase</label>
+                            <input type="password" id="supabaseKey" placeholder="eyJhbGc...">
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="salvarConfig()" style="margin-bottom: 30px;">Salvar Configuração</button>
+
+                    <h3 style="color: #0a3922; margin-bottom: 15px;">Links de Rastreamento:</h3>
+                    <ul style="margin-left: 20px; font-size: 13px; color: #666; line-height: 1.8;">
+                        <li><strong>ATIVA:</strong> https://ativalog.com.br/area-do-cliente/ (CNPJ: 49345358000145)</li>
                         <li><strong>BRASPRESS:</strong> https://www.braspress.com.br/w/tracking/</li>
                         <li><strong>TROCA:</strong> https://rastreamento.grupotroca.com.br</li>
                     </ul>
@@ -410,8 +712,23 @@
         </div>
     </div>
 
+    <!-- MODAL DE EDIÇÃO -->
+    <div class="modal" id="modalEditar">
+        <div class="modal-content">
+            <div class="modal-header">Editar Agendamento</div>
+            <div class="form-grid" id="modalForm"></div>
+            <div class="modal-buttons">
+                <button class="btn btn-cancel" onclick="fecharModal()">Cancelar</button>
+                <button class="btn btn-save" onclick="salvarEdicao()">Salvar Alterações</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script>
         let sbClient = null;
+        let todosRegistros = [];
+        let registroEmEdicao = null;
 
         function mudarAba(index) {
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -455,30 +772,19 @@
                 return;
             }
 
-            const rede = document.getElementById('rede').value;
-            const nf = document.getElementById('nf').value.trim();
-            const dataSap = document.getElementById('dataSap').value;
-            const dataFaturamento = document.getElementById('dataFaturamento').value;
-            const dataExpedicao = document.getElementById('dataExpedicao').value;
-
-            if (!rede || !nf || !dataSap || !dataFaturamento || !dataExpedicao) {
-                mostrarMsg('❌ Preencha os campos obrigatórios (*)', 'error');
-                return;
-            }
-
             const dados = {
-                rede,
+                rede: document.getElementById('rede').value || null,
                 dt_pedido: document.getElementById('dtPedido').value || null,
                 lead_time: document.getElementById('leadTime').value ? parseInt(document.getElementById('leadTime').value) : null,
                 cd: document.getElementById('cd').value || null,
-                data_sap: dataSap,
-                data_faturamento: dataFaturamento,
-                nf: nf,
+                data_sap: document.getElementById('dataSap').value || null,
+                data_faturamento: document.getElementById('dataFaturamento').value || null,
+                nf: document.getElementById('nf').value || null,
                 num_pedido: document.getElementById('numPedido').value || null,
                 data_solicitacao: document.getElementById('dataSolicitacao').value || null,
                 data_agendamento: document.getElementById('dataAgendamento').value || null,
                 data_reagendamento: document.getElementById('dataReagendamento').value || null,
-                data_expedicao: dataExpedicao,
+                data_expedicao: document.getElementById('dataExpedicao').value || null,
                 transportadora: document.getElementById('transportadora').value || null,
                 status: document.getElementById('status').value || null,
                 data_entrega: document.getElementById('dataEntrega').value || null,
@@ -489,7 +795,7 @@
                 const { error } = await sbClient.from('agendamentos').upsert([dados]);
                 if (error) throw error;
 
-                mostrarMsg('✅ Agendamento salvo com sucesso!', 'success');
+                mostrarMsg('✅ Agendamento salvo!', 'success');
                 limparForm();
                 carregarTodos();
             } catch (err) {
@@ -502,53 +808,330 @@
 
             try {
                 const { data } = await sbClient.from('agendamentos').select('*').order('criado_em', { ascending: false });
-                
-                if (!data) return;
-
-                renderizarTabelas(data);
+                todosRegistros = data || [];
+                renderizarTodas();
             } catch (err) {
                 console.error('Erro:', err);
             }
         }
 
-        function renderizarTabelas(registros) {
-            const redes = [
-                { nome: 'AMAZON', id: 'tabelaAmazon' },
-                { nome: 'SÃO PAULO', id: 'tabelaSaoPaulo' },
-                { nome: 'PACHECO', id: 'tabelaPacheco' }
-            ];
-            
-            redes.forEach(rede => {
-                const registrosRede = registros.filter(r => r.rede === rede.nome);
-                const container = document.getElementById(rede.id);
-                
-                if (registrosRede.length === 0) {
-                    container.innerHTML = '<p style="color: #999;">Nenhum agendamento</p>';
-                    return;
+        function renderizarTodas() {
+            renderizarTabela('AMAZON', 'tabelaAmazon', 1);
+            renderizarTabela('SÃO PAULO', 'tabelaSaoPaulo', 2);
+            renderizarTabela('PACHECO', 'tabelaPacheco', 3);
+        }
+
+        function filtrarTabela(abaIndex) {
+            const redes = ['AMAZON', 'SÃO PAULO', 'PACHECO'];
+            const rede = redes[abaIndex - 1];
+            const ids = ['tabelaAmazon', 'tabelaSaoPaulo', 'tabelaPacheco'];
+            renderizarTabela(rede, ids[abaIndex - 1], abaIndex);
+        }
+
+        function renderizarTabela(rede, containerId, abaIndex) {
+            const container = document.getElementById(containerId);
+            let registros = todosRegistros.filter(r => r.rede === rede);
+
+            const busca = document.getElementById(`buscaNF${abaIndex}`)?.value.toLowerCase() || '';
+            const statusFilter = document.getElementById(`filtroStatus${abaIndex}`)?.value || '';
+            const transpFilter = document.getElementById(`filtroTransp${abaIndex}`)?.value || '';
+            const ordenacao = document.getElementById(`ordenacao${abaIndex}`)?.value || 'criado_desc';
+
+            if (busca) {
+                registros = registros.filter(r => 
+                    (r.nf && r.nf.toLowerCase().includes(busca)) || 
+                    (r.num_pedido && r.num_pedido.toLowerCase().includes(busca))
+                );
+            }
+
+            if (statusFilter) registros = registros.filter(r => r.status === statusFilter);
+            if (transpFilter) registros = registros.filter(r => r.transportadora === transpFilter);
+
+            // Ordenação
+            registros.sort((a, b) => {
+                switch(ordenacao) {
+                    case 'criado_asc':
+                        return new Date(a.criado_em) - new Date(b.criado_em);
+                    case 'nf_asc':
+                        return (a.nf || '').localeCompare(b.nf || '');
+                    case 'nf_desc':
+                        return (b.nf || '').localeCompare(a.nf || '');
+                    case 'data_exp_asc':
+                        return new Date(a.data_expedicao || 0) - new Date(b.data_expedicao || 0);
+                    case 'data_exp_desc':
+                        return new Date(b.data_expedicao || 0) - new Date(a.data_expedicao || 0);
+                    default:
+                        return new Date(b.criado_em) - new Date(a.criado_em);
                 }
-
-                let html = '<table><thead><tr><th>NF</th><th>Pedido</th><th>Data Pedido</th><th>Expedição</th><th>Transportadora</th><th>Status</th><th>Entrega</th></tr></thead><tbody>';
-
-                registrosRede.forEach(r => {
-                    html += `<tr>
-                        <td><strong>${r.nf}</strong></td>
-                        <td>${r.num_pedido || '-'}</td>
-                        <td>${r.dt_pedido ? new Date(r.dt_pedido).toLocaleDateString('pt-BR') : '-'}</td>
-                        <td>${r.data_expedicao ? new Date(r.data_expedicao).toLocaleDateString('pt-BR') : '-'}</td>
-                        <td>${r.transportadora || '-'}</td>
-                        <td><span class="status-badge">${r.status || '-'}</span></td>
-                        <td>${r.data_entrega ? new Date(r.data_entrega).toLocaleDateString('pt-BR') : '-'}</td>
-                    </tr>`;
-                });
-
-                html += '</tbody></table>';
-                container.innerHTML = html;
             });
+
+            if (registros.length === 0) {
+                container.innerHTML = '<div class="empty-state">📭 Nenhum agendamento</div>';
+                return;
+            }
+
+            let html = `<table>
+                <thead>
+                    <tr>
+                        <th>NF</th>
+                        <th>Pedido</th>
+                        <th>Data Pedido</th>
+                        <th>SAP</th>
+                        <th>Faturamento</th>
+                        <th>Expedição</th>
+                        <th>Entrega</th>
+                        <th>Transp.</th>
+                        <th>Status</th>
+                        <th>Tempo (d)</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>`;
+
+            registros.forEach(r => {
+                const tempoTotal = calcularDias(r.data_sap, r.data_entrega);
+                const statusBadge = getStatusBadge(r.status);
+                
+                html += `<tr>
+                    <td><strong>${r.nf}</strong></td>
+                    <td>${r.num_pedido || '-'}</td>
+                    <td>${formatarData(r.dt_pedido)}</td>
+                    <td>${formatarData(r.data_sap)}</td>
+                    <td>${formatarData(r.data_faturamento)}</td>
+                    <td>${formatarData(r.data_expedicao)}</td>
+                    <td>${formatarData(r.data_entrega)}</td>
+                    <td>${r.transportadora || '-'}</td>
+                    <td>${statusBadge}</td>
+                    <td>${tempoTotal}</td>
+                    <td>
+                        <div class="actions">
+                            <button class="btn btn-sm btn-rastrear" onclick="rastrear('${r.transportadora}', '${r.nf}')">Rastrear</button>
+                            <button class="btn btn-sm btn-edit" onclick="abrirEdicao('${r.id}')">✏️</button>
+                            <button class="btn btn-sm btn-delete" onclick="deletarRegistro('${r.id}')">🗑️</button>
+                        </div>
+                    </td>
+                </tr>`;
+            });
+
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        function calcularDias(data1, data2) {
+            if (!data1 || !data2) return '-';
+            const d1 = new Date(data1);
+            const d2 = new Date(data2);
+            const dias = Math.floor((d2 - d1) / (1000 * 60 * 60 * 24));
+            return dias >= 0 ? dias + 'd' : '-';
+        }
+
+        function formatarData(data) {
+            if (!data) return '-';
+            return new Date(data).toLocaleDateString('pt-BR');
+        }
+
+        function getStatusBadge(status) {
+            const classes = {
+                'ENTREGUE': 'status-entregue',
+                'EM ROTA': 'status-em-rota',
+                'ENTREGA AGENDADA': 'status-agendado'
+            };
+            return `<span class="status-badge ${classes[status] || ''}"> ${status || '-'}</span>`;
+        }
+
+        function rastrear(transportadora, nf) {
+            const links = {
+                'ATIVA': 'https://ativalog.com.br/area-do-cliente/',
+                'BRASPRESS': `https://www.braspress.com.br/w/tracking/search?cnpj=49345358000145&documentType=NOTAFISCAL&numero=${nf}&isSite=true`,
+                'TROCA': 'https://rastreamento.grupotroca.com.br:8443/gtsys/index.php?class=gtsys_search_cte'
+            };
+            window.open(links[transportadora] || '#', '_blank');
+        }
+
+        function abrirEdicao(id) {
+            const reg = todosRegistros.find(r => r.id === id);
+            if (!reg) return;
+
+            registroEmEdicao = reg;
+            const form = document.getElementById('modalForm');
+            
+            form.innerHTML = `
+                <div class="form-group"><label>Rede</label><input type="text" value="${reg.rede}" disabled></div>
+                <div class="form-group"><label>NF</label><input type="text" id="edit_nf" value="${reg.nf}"></div>
+                <div class="form-group"><label>Pedido</label><input type="text" id="edit_numPedido" value="${reg.num_pedido || ''}"></div>
+                <div class="form-group"><label>Data Pedido</label><input type="date" id="edit_dtPedido" value="${reg.dt_pedido || ''}"></div>
+                <div class="form-group"><label>Lead Time</label><input type="number" id="edit_leadTime" value="${reg.lead_time || ''}"></div>
+                <div class="form-group"><label>CD</label><input type="text" id="edit_cd" value="${reg.cd || ''}"></div>
+                <div class="form-group"><label>Data SAP</label><input type="date" id="edit_dataSap" value="${reg.data_sap}"></div>
+                <div class="form-group"><label>Data Faturamento</label><input type="date" id="edit_dataFaturamento" value="${reg.data_faturamento}"></div>
+                <div class="form-group"><label>Data Solicitação</label><input type="date" id="edit_dataSolicitacao" value="${reg.data_solicitacao || ''}"></div>
+                <div class="form-group"><label>Data Agendamento</label><input type="date" id="edit_dataAgendamento" value="${reg.data_agendamento || ''}"></div>
+                <div class="form-group"><label>Data Reagendamento</label><input type="date" id="edit_dataReagendamento" value="${reg.data_reagendamento || ''}"></div>
+                <div class="form-group"><label>Data Expedição</label><input type="date" id="edit_dataExpedicao" value="${reg.data_expedicao}"></div>
+                <div class="form-group"><label>Transportadora</label><select id="edit_transportadora"><option value="">-- Selecione --</option><option value="ATIVA" ${reg.transportadora === 'ATIVA' ? 'selected' : ''}>ATIVA</option><option value="BRASPRESS" ${reg.transportadora === 'BRASPRESS' ? 'selected' : ''}>BRASPRESS</option><option value="TROCA" ${reg.transportadora === 'TROCA' ? 'selected' : ''}>TROCA</option></select></div>
+                <div class="form-group"><label>Status</label><select id="edit_status"><option value="">-- Selecione --</option><option value="ENTREGUE" ${reg.status === 'ENTREGUE' ? 'selected' : ''}>ENTREGUE</option><option value="EM ROTA" ${reg.status === 'EM ROTA' ? 'selected' : ''}>EM ROTA</option><option value="ENTREGA AGENDADA" ${reg.status === 'ENTREGA AGENDADA' ? 'selected' : ''}>ENTREGA AGENDADA</option><option value="AGUARDANDO AGENDAMENTO" ${reg.status === 'AGUARDANDO AGENDAMENTO' ? 'selected' : ''}>AGUARDANDO AGENDAMENTO</option><option value="CANCELADO" ${reg.status === 'CANCELADO' ? 'selected' : ''}>CANCELADO</option></select></div>
+                <div class="form-group"><label>Data Entrega</label><input type="date" id="edit_dataEntrega" value="${reg.data_entrega || ''}"></div>
+                <div class="form-group" style="grid-column: 1/-1;"><label>Observação</label><textarea id="edit_observacao" style="resize: vertical; min-height: 60px;">${reg.observacao || ''}</textarea></div>
+            `;
+
+            document.getElementById('modalEditar').classList.add('show');
+        }
+
+        function fecharModal() {
+            document.getElementById('modalEditar').classList.remove('show');
+        }
+
+        async function salvarEdicao() {
+            if (!registroEmEdicao) return;
+
+            const dados = {
+                ...registroEmEdicao,
+                nf: document.getElementById('edit_nf').value,
+                num_pedido: document.getElementById('edit_numPedido').value || null,
+                dt_pedido: document.getElementById('edit_dtPedido').value || null,
+                lead_time: document.getElementById('edit_leadTime').value ? parseInt(document.getElementById('edit_leadTime').value) : null,
+                cd: document.getElementById('edit_cd').value || null,
+                data_sap: document.getElementById('edit_dataSap').value,
+                data_faturamento: document.getElementById('edit_dataFaturamento').value,
+                data_solicitacao: document.getElementById('edit_dataSolicitacao').value || null,
+                data_agendamento: document.getElementById('edit_dataAgendamento').value || null,
+                data_reagendamento: document.getElementById('edit_dataReagendamento').value || null,
+                data_expedicao: document.getElementById('edit_dataExpedicao').value,
+                transportadora: document.getElementById('edit_transportadora').value || null,
+                status: document.getElementById('edit_status').value || null,
+                data_entrega: document.getElementById('edit_dataEntrega').value || null,
+                observacao: document.getElementById('edit_observacao').value || null
+            };
+
+            try {
+                const { error } = await sbClient.from('agendamentos').update(dados).eq('id', registroEmEdicao.id);
+                if (error) throw error;
+
+                mostrarMsg('✅ Alterações salvas!', 'success');
+                fecharModal();
+                carregarTodos();
+            } catch (err) {
+                mostrarMsg('❌ Erro: ' + err.message, 'error');
+            }
+        }
+
+        async function deletarRegistro(id) {
+            if (!confirm('Tem certeza que deseja deletar este agendamento?')) return;
+
+            try {
+                const { error } = await sbClient.from('agendamentos').delete().eq('id', id);
+                if (error) throw error;
+
+                mostrarMsg('✅ Agendamento deletado!', 'success');
+                carregarTodos();
+            } catch (err) {
+                mostrarMsg('❌ Erro: ' + err.message, 'error');
+            }
         }
 
         function limparForm() {
             document.querySelectorAll('#aba-0 input, #aba-0 select, #aba-0 textarea').forEach(el => el.value = '');
         }
+
+        function importarArquivo(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                try {
+                    const data = e.target.result;
+                    let jsonData = [];
+
+                    if (file.name.endsWith('.csv')) {
+                        const lines = data.split('\n');
+                        const headers = lines[0].split(',').map(h => h.trim());
+                        for (let i = 1; i < lines.length; i++) {
+                            if (lines[i].trim()) {
+                                const values = lines[i].split(',');
+                                const obj = {};
+                                headers.forEach((h, idx) => obj[h] = values[idx]?.trim() || null);
+                                jsonData.push(obj);
+                            }
+                        }
+                    } else {
+                        const workbook = XLSX.read(data, { type: 'binary' });
+                        const sheets = workbook.SheetNames;
+                        sheets.forEach(sheet => {
+                            const json = XLSX.utils.sheet_to_json(workbook.Sheets[sheet]);
+                            jsonData = jsonData.concat(json);
+                        });
+                    }
+
+                    if (jsonData.length === 0) {
+                        mostrarMsg('❌ Nenhum dado encontrado no arquivo', 'error');
+                        return;
+                    }
+
+                    const registrosFormatados = jsonData.map(row => ({
+                        rede: row.Rede || row.rede || '',
+                        dt_pedido: formatarDataEntrada(row['Data do Pedido'] || row.dt_pedido),
+                        lead_time: parseInt(row['Lead time'] || row.lead_time) || null,
+                        cd: row.CD || row.cd || null,
+                        data_sap: formatarDataEntrada(row['Data SAP'] || row.data_sap),
+                        data_faturamento: formatarDataEntrada(row['Data Faturamento'] || row.data_faturamento),
+                        nf: row.NF || row.nf || row['Nº NF'] || '',
+                        num_pedido: row['Nº Pedido'] || row.num_pedido || null,
+                        data_solicitacao: formatarDataEntrada(row['Data Solicitação'] || row.data_solicitacao),
+                        data_agendamento: formatarDataEntrada(row['Data Agendamento'] || row.data_agendamento),
+                        data_reagendamento: formatarDataEntrada(row['Data Reagendamento'] || row.data_reagendamento),
+                        data_expedicao: formatarDataEntrada(row['Data Expedição'] || row.data_expedicao),
+                        transportadora: row.Transportadora || row.transportadora || null,
+                        status: row.Status || row.status || null,
+                        data_entrega: formatarDataEntrada(row['Data Entrega'] || row.data_entrega),
+                        observacao: row.Observação || row.observacao || null
+                    }));
+
+                    // Salvar no Supabase
+                    if (!sbClient) {
+                        mostrarMsg('❌ Configure Supabase na aba Config', 'error');
+                        return;
+                    }
+
+                    const { error } = await sbClient.from('agendamentos').insert(registrosFormatados);
+                    if (error) throw error;
+
+                    mostrarMsg(`✅ ${registrosFormatados.length} registros importados com sucesso!`, 'success');
+                    carregarTodos();
+                    document.getElementById('fileInput').value = '';
+                } catch (err) {
+                    mostrarMsg('❌ Erro ao importar: ' + err.message, 'error');
+                }
+            };
+            reader.readAsBinaryString(file);
+        }
+
+        function formatarDataEntrada(data) {
+            if (!data) return null;
+            if (typeof data === 'number') {
+                const date = new Date((data - 25569) * 86400 * 1000);
+                return date.toISOString().split('T')[0];
+            }
+            const d = new Date(data);
+            if (!isNaN(d)) return d.toISOString().split('T')[0];
+            return null;
+        }
+
+        // Drag and drop
+        const dropZone = document.getElementById('dropZone');
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            document.getElementById('fileInput').files = e.dataTransfer.files;
+            importarArquivo({ target: { files: e.dataTransfer.files } });
+        });
 
         window.addEventListener('load', () => {
             const url = localStorage.getItem('supabaseUrl');
@@ -568,23 +1151,47 @@
                 return;
             }
 
-            try {
-                const { data } = await sbClient.from('agendamentos').select('*').or(`nf.ilike.%${termo}%,num_pedido.ilike.%${termo}%`);
-                
-                if (!data || data.length === 0) {
-                    document.getElementById('searchResults').innerHTML = '<p style="color: #999;">Nenhum resultado</p>';
-                    return;
-                }
+            const resultado = todosRegistros.filter(r => 
+                (r.nf && r.nf.toLowerCase().includes(termo)) || 
+                (r.num_pedido && r.num_pedido.toLowerCase().includes(termo))
+            );
 
-                let html = '<table><thead><tr><th>NF</th><th>Pedido</th><th>Rede</th><th>Expedição</th><th>Status</th></tr></thead><tbody>';
-                data.forEach(r => {
-                    html += `<tr><td>${r.nf}</td><td>${r.num_pedido || '-'}</td><td>${r.rede}</td><td>${r.data_expedicao ? new Date(r.data_expedicao).toLocaleDateString('pt-BR') : '-'}</td><td>${r.status || '-'}</td></tr>`;
-                });
-                html += '</tbody></table>';
-                document.getElementById('searchResults').innerHTML = html;
-            } catch (err) {
-                console.error('Erro:', err);
+            if (resultado.length === 0) {
+                document.getElementById('searchResults').innerHTML = '<div class="empty-state">🔍 Nenhum resultado</div>';
+                return;
             }
+
+            let html = `<table>
+                <thead>
+                    <tr>
+                        <th>NF</th>
+                        <th>Pedido</th>
+                        <th>Rede</th>
+                        <th>Expedição</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>`;
+
+            resultado.forEach(r => {
+                html += `<tr>
+                    <td><strong>${r.nf}</strong></td>
+                    <td>${r.num_pedido || '-'}</td>
+                    <td>${r.rede}</td>
+                    <td>${formatarData(r.data_expedicao)}</td>
+                    <td>${getStatusBadge(r.status)}</td>
+                    <td>
+                        <div class="actions">
+                            <button class="btn btn-sm btn-edit" onclick="abrirEdicao('${r.id}')">✏️</button>
+                            <button class="btn btn-sm btn-delete" onclick="deletarRegistro('${r.id}')">🗑️</button>
+                        </div>
+                    </td>
+                </tr>`;
+            });
+
+            html += '</tbody></table>';
+            document.getElementById('searchResults').innerHTML = html;
         });
 
         setInterval(() => { if (sbClient) carregarTodos(); }, 30000);
