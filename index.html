@@ -949,12 +949,18 @@
                         <th>NF</th>
                         <th>Pedido</th>
                         <th>Dt Pedido</th>
-                        <th>SAP</th>
-                        <th>Faturamento</th>
-                        <th>Expedição</th>
-                        <th>Entrega</th>
-                        <th>Transp.</th>
+                        <th>Lead Time</th>
+                        <th>CD</th>
+                        <th>Data SAP</th>
+                        <th>Data Faturamento</th>
+                        <th>Dt Solicitação</th>
+                        <th>Dt Agendamento</th>
+                        <th>Dt Reagendamento</th>
+                        <th>Data Expedição</th>
+                        <th>Transportadora</th>
                         <th>Status</th>
+                        <th>Data Entrega</th>
+                        <th>Observação</th>
                         <th class="tempo-cell">T. Digi</th>
                         <th class="tempo-cell">T. Fatu</th>
                         <th class="tempo-cell">T. Expe</th>
@@ -988,12 +994,18 @@
                     <td><strong>${r.nf}</strong></td>
                     <td>${r.num_pedido || '-'}</td>
                     <td>${formatarData(r.dt_pedido)}</td>
+                    <td>${r.lead_time || '-'}</td>
+                    <td>${r.cd || '-'}</td>
                     <td>${formatarData(r.data_sap)}</td>
                     <td>${formatarData(r.data_faturamento)}</td>
+                    <td>${formatarData(r.data_solicitacao)}</td>
+                    <td>${formatarData(r.data_agendamento)}</td>
+                    <td>${formatarData(r.data_reagendamento)}</td>
                     <td>${formatarData(r.data_expedicao)}</td>
-                    <td>${formatarData(r.data_entrega)}</td>
                     <td>${r.transportadora || '-'}</td>
                     <td>${statusBadge}</td>
+                    <td>${formatarData(r.data_entrega)}</td>
+                    <td style="max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${r.observacao || ''}">${r.observacao || '-'}</td>
                     <td class="tempo-cell">${tempoDigitacao}</td>
                     <td class="tempo-cell">${tempoFaturamento}</td>
                     <td class="tempo-cell">${tempoExpedicao}</td>
