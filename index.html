@@ -6,461 +6,68 @@
     <title>Agendamentos de Expedição - Apis Flora</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #f5f5f5;
-        }
-
-        .container {
-            width: 100%;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .header {
-            background: linear-gradient(135deg, #0a3922 0%, #0b6136 100%);
-            color: white;
-            padding: 25px;
-            text-align: center;
-        }
-
-        .header h1 {
-            font-size: 26px;
-            margin-bottom: 5px;
-        }
-
-        .header p {
-            font-size: 13px;
-            opacity: 0.9;
-        }
-
-        .tabs {
-            display: flex;
-            background: white;
-            border-bottom: 2px solid #e0e0e0;
-            padding: 0 25px;
-            overflow-x: auto;
-        }
-
-        .tab-btn {
-            padding: 12px 20px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 600;
-            color: #333;
-            border-bottom: 3px solid transparent;
-            white-space: nowrap;
-        }
-
-        .tab-btn:hover {
-            color: #0b6136;
-        }
-
-        .tab-btn.active {
-            color: #0b6136;
-            border-bottom-color: #0b6136;
-        }
-
-        .main-content {
-            flex: 1;
-            padding: 25px;
-            overflow-y: auto;
-        }
-
-        .content {
-            display: none;
-        }
-
-        .content.active {
-            display: block;
-        }
-
-        .form-container {
-            background: white;
-            padding: 25px;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            margin-bottom: 25px;
-        }
-
-        .form-title {
-            font-size: 16px;
-            font-weight: 700;
-            margin-bottom: 20px;
-            color: #0a3922;
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .form-group label {
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 5px;
-            font-size: 12px;
-        }
-
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            padding: 8px 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 12px;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: #0b6136;
-            box-shadow: 0 0 0 2px rgba(11, 97, 54, 0.1);
-        }
-
-        .btn {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 4px;
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 12px;
-        }
-
-        .btn-primary {
-            background: #0b6136;
-            color: white;
-            width: 100%;
-            padding: 10px;
-        }
-
-        .btn-primary:hover {
-            background: #0a3922;
-        }
-
-        .btn-sm {
-            padding: 4px 8px;
-            font-size: 11px;
-        }
-
-        .btn-edit {
-            background: #3b82f6;
-            color: white;
-            margin-right: 5px;
-        }
-
-        .btn-delete {
-            background: #ef4444;
-            color: white;
-        }
-
-        .btn-rastrear {
-            background: #0b6136;
-            color: white;
-        }
-
-        .message {
-            padding: 12px 16px;
-            border-radius: 4px;
-            margin-bottom: 20px;
-            display: none;
-            font-size: 13px;
-        }
-
-        .message.show {
-            display: block;
-        }
-
-        .message.success {
-            background: #d1fae5;
-            color: #065f46;
-            border-left: 4px solid #10b981;
-        }
-
-        .message.error {
-            background: #fee2e2;
-            color: #7f1d1d;
-            border-left: 4px solid #ef4444;
-        }
-
-        .toast {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: white;
-            border-radius: 8px;
-            padding: 16px 24px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            display: none;
-            z-index: 2000;
-            font-size: 14px;
-            animation: slideIn 0.3s ease;
-        }
-
-        .toast.show {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .toast.success {
-            border-left: 4px solid #10b981;
-            color: #065f46;
-        }
-
-        .toast.error {
-            border-left: 4px solid #ef4444;
-            color: #7f1d1d;
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateX(400px);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        .filters {
-            background: white;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-
-        .filter-title {
-            font-weight: 700;
-            color: #0a3922;
-            margin-bottom: 12px;
-            font-size: 13px;
-        }
-
-        .filter-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 12px;
-            margin-bottom: 15px;
-        }
-
-        .filter-group {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .filter-group label {
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 5px;
-            font-size: 12px;
-        }
-
-        .filter-group input,
-        .filter-group select {
-            padding: 6px 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 12px;
-        }
-
-        .table-container {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 11px;
-        }
-
-        thead {
-            background: #0a3922;
-            color: white;
-            position: sticky;
-            top: 0;
-        }
-
-        th {
-            padding: 10px 8px;
-            text-align: left;
-            font-weight: 600;
-            border-bottom: 1px solid #ddd;
-            cursor: pointer;
-            user-select: none;
-        }
-
-        th:hover {
-            background: #0b6136;
-        }
-
-        tbody tr {
-            border-bottom: 1px solid #eee;
-        }
-
-        tbody tr:hover {
-            background: #f9f9f9;
-        }
-
-        td {
-            padding: 8px;
-        }
-
-        .actions {
-            display: flex;
-            gap: 5px;
-            white-space: nowrap;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal.show {
-            display: flex;
-        }
-
-        .modal-content {
-            background: white;
-            border-radius: 8px;
-            padding: 30px;
-            max-width: 900px;
-            width: 90%;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        .modal-header {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 20px;
-            color: #0a3922;
-        }
-
-        .modal-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        .btn-cancel {
-            background: #e0e0e0;
-            color: #333;
-            flex: 1;
-        }
-
-        .btn-save {
-            background: #0b6136;
-            color: white;
-            flex: 1;
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-weight: 600;
-            font-size: 10px;
-        }
-
-        .status-entregue {
-            background: #d1fae5;
-            color: #065f46;
-        }
-
-        .status-em-rota {
-            background: #dbeafe;
-            color: #0c4a6e;
-        }
-
-        .status-agendado {
-            background: #fef3c7;
-            color: #78350f;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 40px;
-            color: #999;
-        }
-
-        .config-section {
-            background: white;
-            padding: 25px;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-
-        .import-zone {
-            border: 2px dashed #0b6136;
-            border-radius: 8px;
-            padding: 30px;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .import-zone.dragover {
-            background: #f0fdf4;
-        }
-
-        .import-zone input[type="file"] {
-            display: none;
-        }
-
-        .tempo-cell {
-            background: #f0fdf4;
-            font-weight: 600;
-            color: #0b6136;
-        }
-
-        @media (max-width: 768px) {
-            .main-content {
-                padding: 15px;
-            }
-
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-
-            table {
-                font-size: 10px;
-            }
-
-            td, th {
-                padding: 6px;
-            }
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; }
+        .container { width: 100%; min-height: 100vh; display: flex; flex-direction: column; }
+        .header { background: linear-gradient(135deg, #0a3922 0%, #0b6136 100%); color: white; padding: 25px; text-align: center; }
+        .header h1 { font-size: 26px; margin-bottom: 5px; }
+        .header p { font-size: 13px; opacity: 0.9; }
+        .tabs { display: flex; background: white; border-bottom: 2px solid #e0e0e0; padding: 0 25px; overflow-x: auto; }
+        .tab-btn { padding: 12px 20px; background: none; border: none; cursor: pointer; font-size: 13px; font-weight: 600; color: #333; border-bottom: 3px solid transparent; white-space: nowrap; }
+        .tab-btn:hover { color: #0b6136; }
+        .tab-btn.active { color: #0b6136; border-bottom-color: #0b6136; }
+        .main-content { flex: 1; padding: 25px; overflow-y: auto; }
+        .content { display: none; }
+        .content.active { display: block; }
+        .form-container { background: white; padding: 25px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 25px; }
+        .form-title { font-size: 16px; font-weight: 700; margin-bottom: 20px; color: #0a3922; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px; }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group label { font-weight: 600; color: #333; margin-bottom: 5px; font-size: 12px; }
+        .form-group input, .form-group select, .form-group textarea { padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: #0b6136; box-shadow: 0 0 0 2px rgba(11, 97, 54, 0.1); }
+        .btn { padding: 8px 16px; border: none; border-radius: 4px; font-weight: 600; cursor: pointer; font-size: 12px; }
+        .btn-primary { background: #0b6136; color: white; width: 100%; padding: 10px; }
+        .btn-primary:hover { background: #0a3922; }
+        .btn-sm { padding: 4px 8px; font-size: 11px; }
+        .btn-edit { background: #3b82f6; color: white; margin-right: 5px; }
+        .btn-delete { background: #ef4444; color: white; }
+        .btn-rastrear { background: #0b6136; color: white; }
+        .toast { position: fixed; top: 20px; right: 20px; background: white; border-radius: 8px; padding: 16px 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: none; z-index: 2000; font-size: 14px; animation: slideIn 0.3s ease; }
+        .toast.show { display: flex; align-items: center; gap: 10px; }
+        .toast.success { border-left: 4px solid #10b981; color: #065f46; }
+        @keyframes slideIn { from { transform: translateX(400px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .filters { background: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .filter-title { font-weight: 700; color: #0a3922; margin-bottom: 12px; font-size: 13px; }
+        .filter-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 15px; }
+        .filter-group { display: flex; flex-direction: column; }
+        .filter-group label { font-weight: 600; color: #333; margin-bottom: 5px; font-size: 12px; }
+        .filter-group input, .filter-group select { padding: 6px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; }
+        .table-container { background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 11px; }
+        thead { background: #0a3922; color: white; position: sticky; top: 0; }
+        th { padding: 10px 8px; text-align: left; font-weight: 600; border-bottom: 1px solid #ddd; cursor: pointer; user-select: none; }
+        th:hover { background: #0b6136; }
+        tbody tr { border-bottom: 1px solid #eee; }
+        tbody tr:hover { background: #f9f9f9; }
+        td { padding: 8px; }
+        .actions { display: flex; gap: 5px; white-space: nowrap; }
+        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
+        .modal.show { display: flex; }
+        .modal-content { background: white; border-radius: 8px; padding: 30px; max-width: 900px; width: 90%; max-height: 90vh; overflow-y: auto; }
+        .modal-header { font-size: 18px; font-weight: 700; margin-bottom: 20px; color: #0a3922; }
+        .modal-buttons { display: flex; gap: 10px; margin-top: 20px; }
+        .btn-cancel { background: #e0e0e0; color: #333; flex: 1; }
+        .btn-save { background: #0b6136; color: white; flex: 1; }
+        .status-badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-weight: 600; font-size: 10px; }
+        .status-entregue { background: #d1fae5; color: #065f46; }
+        .status-em-rota { background: #dbeafe; color: #0c4a6e; }
+        .status-agendado { background: #fef3c7; color: #78350f; }
+        .empty-state { text-align: center; padding: 40px; color: #999; }
+        .tempo-cell { background: #f0fdf4; font-weight: 600; color: #0b6136; }
+        .import-zone { border: 2px dashed #0b6136; border-radius: 8px; padding: 30px; text-align: center; margin-bottom: 20px; }
+        .import-zone.dragover { background: #f0fdf4; }
+        .import-zone input[type="file"] { display: none; }
     </style>
 </head>
 <body>
@@ -471,7 +78,6 @@
             <button class="btn btn-sm" style="background: white; color: #0a3922; margin-top: 10px; padding: 6px 12px; font-weight: 600;" onclick="forcarRecarregamento()">🔄 Recarregar Dados</button>
         </div>
 
-        <div id="message" class="message"></div>
         <div id="toast" class="toast"></div>
 
         <div class="tabs">
@@ -499,211 +105,63 @@
                                 <option value="PACHECO">PACHECO</option>
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label>Data do Pedido</label>
-                            <input type="date" id="dtPedido">
-                        </div>
-                        <div class="form-group">
-                            <label>Lead time (dias)</label>
-                            <input type="number" id="leadTime" min="0">
-                        </div>
-                        <div class="form-group">
-                            <label>CD</label>
-                            <input type="text" id="cd">
-                        </div>
-                        <div class="form-group">
-                            <label>Data SAP</label>
-                            <input type="date" id="dataSap">
-                        </div>
-                        <div class="form-group">
-                            <label>Data Faturamento</label>
-                            <input type="date" id="dataFaturamento">
-                        </div>
-                        <div class="form-group">
-                            <label>NF</label>
-                            <input type="text" id="nf">
-                        </div>
-                        <div class="form-group">
-                            <label>Nº Pedido</label>
-                            <input type="text" id="numPedido">
-                        </div>
-                        <div class="form-group">
-                            <label>Data Solicitação</label>
-                            <input type="date" id="dataSolicitacao">
-                        </div>
-                        <div class="form-group">
-                            <label>Data Agendamento</label>
-                            <input type="date" id="dataAgendamento">
-                        </div>
-                        <div class="form-group">
-                            <label>Data Reagendamento</label>
-                            <input type="date" id="dataReagendamento">
-                        </div>
-                        <div class="form-group">
-                            <label>Data Expedição</label>
-                            <input type="date" id="dataExpedicao">
-                        </div>
-                        <div class="form-group">
-                            <label>Transportadora</label>
-                            <select id="transportadora">
-                                <option value="">-- Selecione --</option>
-                                <option value="ATIVA">ATIVA</option>
-                                <option value="BRASPRESS">BRASPRESS</option>
-                                <option value="TROCA">TROCA</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Status</label>
-                            <select id="status">
-                                <option value="">-- Selecione --</option>
-                                <option value="ENTREGUE">ENTREGUE</option>
-                                <option value="EM ROTA">EM ROTA</option>
-                                <option value="ENTREGA AGENDADA">ENTREGA AGENDADA</option>
-                                <option value="AGUARDANDO AGENDAMENTO">AGUARDANDO AGENDAMENTO</option>
-                                <option value="CANCELADO">CANCELADO</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Data Entrega</label>
-                            <input type="date" id="dataEntrega">
-                        </div>
-                        <div class="form-group" style="grid-column: 1/-1;">
-                            <label>Observação</label>
-                            <textarea id="observacao" style="resize: vertical; min-height: 60px;"></textarea>
-                        </div>
+                        <div class="form-group"><label>Dt. Pedido</label><input type="date" id="dtPedido"></div>
+                        <div class="form-group"><label>Lead Time</label><input type="number" id="leadTime" min="0"></div>
+                        <div class="form-group"><label>CD</label><input type="text" id="cd"></div>
+                        <div class="form-group"><label>Data SAP</label><input type="date" id="dataSap"></div>
+                        <div class="form-group"><label>Data Faturamento</label><input type="date" id="dataFaturamento"></div>
+                        <div class="form-group"><label>NF</label><input type="text" id="nf"></div>
+                        <div class="form-group"><label>Nº Pedido</label><input type="text" id="numPedido"></div>
+                        <div class="form-group"><label>Data Solicitação</label><input type="date" id="dataSolicitacao"></div>
+                        <div class="form-group"><label>Data Agendamento</label><input type="date" id="dataAgendamento"></div>
+                        <div class="form-group"><label>Data Reagendamento</label><input type="date" id="dataReagendamento"></div>
+                        <div class="form-group"><label>Data Expedição</label><input type="date" id="dataExpedicao"></div>
+                        <div class="form-group"><label>Transportadora</label><select id="transportadora"><option value="">-- Selecione --</option><option value="ATIVA">ATIVA</option><option value="BRASPRESS">BRASPRESS</option><option value="TROCA">TROCA</option></select></div>
+                        <div class="form-group"><label>Status</label><select id="status"><option value="">-- Selecione --</option><option value="ENTREGUE">ENTREGUE</option><option value="EM ROTA">EM ROTA</option><option value="ENTREGA AGENDADA">ENTREGA AGENDADA</option><option value="AGUARDANDO AGENDAMENTO">AGUARDANDO AGENDAMENTO</option><option value="CANCELADO">CANCELADO</option></select></div>
+                        <div class="form-group"><label>Data Entrega</label><input type="date" id="dataEntrega"></div>
+                        <div class="form-group" style="grid-column: 1/-1;"><label>Observação</label><textarea id="observacao" style="resize: vertical; min-height: 60px;"></textarea></div>
                     </div>
                     <button class="btn btn-primary" onclick="salvarAgendamento()">💾 Salvar Agendamento</button>
                 </div>
             </div>
 
-            <!-- ABA 1, 2, 3: TABELAS POR REDE -->
+            <!-- ABA 1: AMAZON -->
             <div class="content" id="aba-1">
                 <div class="filters">
                     <div class="filter-title">🔍 Filtros e Busca</div>
                     <div class="filter-grid">
-                        <div class="filter-group">
-                            <label>Buscar NF/Pedido</label>
-                            <input type="text" id="buscaNF1" placeholder="Digite NF ou pedido..." onkeyup="filtrarTabela(1)">
-                        </div>
-                        <div class="filter-group">
-                            <label>Status</label>
-                            <select id="filtroStatus1" onchange="filtrarTabela(1)">
-                                <option value="">Todos</option>
-                                <option value="ENTREGUE">ENTREGUE</option>
-                                <option value="EM ROTA">EM ROTA</option>
-                                <option value="ENTREGA AGENDADA">ENTREGA AGENDADA</option>
-                                <option value="AGUARDANDO AGENDAMENTO">AGUARDANDO AGENDAMENTO</option>
-                                <option value="CANCELADO">CANCELADO</option>
-                            </select>
-                        </div>
-                        <div class="filter-group">
-                            <label>Transportadora</label>
-                            <select id="filtroTransp1" onchange="filtrarTabela(1)">
-                                <option value="">Todos</option>
-                                <option value="ATIVA">ATIVA</option>
-                                <option value="BRASPRESS">BRASPRESS</option>
-                                <option value="TROCA">TROCA</option>
-                            </select>
-                        </div>
-                        <div class="filter-group">
-                            <label>Ordenar por</label>
-                            <select id="ordenacao1" onchange="filtrarTabela(1)">
-                                <option value="criado_desc">Mais recentes</option>
-                                <option value="criado_asc">Mais antigos</option>
-                                <option value="nf_asc">NF (A-Z)</option>
-                                <option value="nf_desc">NF (Z-A)</option>
-                                <option value="data_exp_asc">Expedição (Crescente)</option>
-                                <option value="data_exp_desc">Expedição (Decrescente)</option>
-                            </select>
-                        </div>
+                        <div class="filter-group"><label>Buscar NF/Pedido</label><input type="text" id="buscaNF1" placeholder="Digite NF ou pedido..." onkeyup="filtrarTabela(1)"></div>
+                        <div class="filter-group"><label>Status</label><select id="filtroStatus1" onchange="filtrarTabela(1)"><option value="">Todos</option><option value="ENTREGUE">ENTREGUE</option><option value="EM ROTA">EM ROTA</option><option value="ENTREGA AGENDADA">ENTREGA AGENDADA</option><option value="AGUARDANDO AGENDAMENTO">AGUARDANDO AGENDAMENTO</option><option value="CANCELADO">CANCELADO</option></select></div>
+                        <div class="filter-group"><label>Transportadora</label><select id="filtroTransp1" onchange="filtrarTabela(1)"><option value="">Todos</option><option value="ATIVA">ATIVA</option><option value="BRASPRESS">BRASPRESS</option><option value="TROCA">TROCA</option></select></div>
+                        <div class="filter-group"><label>Ordenar</label><select id="ordenacao1" onchange="filtrarTabela(1)"><option value="criado_desc">Mais recentes</option><option value="criado_asc">Mais antigos</option></select></div>
                     </div>
                 </div>
                 <div class="table-container" id="tabelaAmazon"></div>
             </div>
 
+            <!-- ABA 2: SÃO PAULO -->
             <div class="content" id="aba-2">
                 <div class="filters">
                     <div class="filter-title">🔍 Filtros e Busca</div>
                     <div class="filter-grid">
-                        <div class="filter-group">
-                            <label>Buscar NF/Pedido</label>
-                            <input type="text" id="buscaNF2" placeholder="Digite NF ou pedido..." onkeyup="filtrarTabela(2)">
-                        </div>
-                        <div class="filter-group">
-                            <label>Status</label>
-                            <select id="filtroStatus2" onchange="filtrarTabela(2)">
-                                <option value="">Todos</option>
-                                <option value="ENTREGUE">ENTREGUE</option>
-                                <option value="EM ROTA">EM ROTA</option>
-                                <option value="ENTREGA AGENDADA">ENTREGA AGENDADA</option>
-                                <option value="AGUARDANDO AGENDAMENTO">AGUARDANDO AGENDAMENTO</option>
-                                <option value="CANCELADO">CANCELADO</option>
-                            </select>
-                        </div>
-                        <div class="filter-group">
-                            <label>Transportadora</label>
-                            <select id="filtroTransp2" onchange="filtrarTabela(2)">
-                                <option value="">Todos</option>
-                                <option value="ATIVA">ATIVA</option>
-                                <option value="BRASPRESS">BRASPRESS</option>
-                                <option value="TROCA">TROCA</option>
-                            </select>
-                        </div>
-                        <div class="filter-group">
-                            <label>Ordenar por</label>
-                            <select id="ordenacao2" onchange="filtrarTabela(2)">
-                                <option value="criado_desc">Mais recentes</option>
-                                <option value="criado_asc">Mais antigos</option>
-                                <option value="nf_asc">NF (A-Z)</option>
-                                <option value="nf_desc">NF (Z-A)</option>
-                                <option value="data_exp_asc">Expedição (Crescente)</option>
-                                <option value="data_exp_desc">Expedição (Decrescente)</option>
-                            </select>
-                        </div>
+                        <div class="filter-group"><label>Buscar NF/Pedido</label><input type="text" id="buscaNF2" placeholder="Digite NF ou pedido..." onkeyup="filtrarTabela(2)"></div>
+                        <div class="filter-group"><label>Status</label><select id="filtroStatus2" onchange="filtrarTabela(2)"><option value="">Todos</option><option value="ENTREGUE">ENTREGUE</option><option value="EM ROTA">EM ROTA</option><option value="ENTREGA AGENDADA">ENTREGA AGENDADA</option><option value="AGUARDANDO AGENDAMENTO">AGUARDANDO AGENDAMENTO</option><option value="CANCELADO">CANCELADO</option></select></div>
+                        <div class="filter-group"><label>Transportadora</label><select id="filtroTransp2" onchange="filtrarTabela(2)"><option value="">Todos</option><option value="ATIVA">ATIVA</option><option value="BRASPRESS">BRASPRESS</option><option value="TROCA">TROCA</option></select></div>
+                        <div class="filter-group"><label>Ordenar</label><select id="ordenacao2" onchange="filtrarTabela(2)"><option value="criado_desc">Mais recentes</option><option value="criado_asc">Mais antigos</option></select></div>
                     </div>
                 </div>
                 <div class="table-container" id="tabelaSaoPaulo"></div>
             </div>
 
+            <!-- ABA 3: PACHECO -->
             <div class="content" id="aba-3">
                 <div class="filters">
                     <div class="filter-title">🔍 Filtros e Busca</div>
                     <div class="filter-grid">
-                        <div class="filter-group">
-                            <label>Buscar NF/Pedido</label>
-                            <input type="text" id="buscaNF3" placeholder="Digite NF ou pedido..." onkeyup="filtrarTabela(3)">
-                        </div>
-                        <div class="filter-group">
-                            <label>Status</label>
-                            <select id="filtroStatus3" onchange="filtrarTabela(3)">
-                                <option value="">Todos</option>
-                                <option value="ENTREGUE">ENTREGUE</option>
-                                <option value="EM ROTA">EM ROTA</option>
-                                <option value="ENTREGA AGENDADA">ENTREGA AGENDADA</option>
-                                <option value="AGUARDANDO AGENDAMENTO">AGUARDANDO AGENDAMENTO</option>
-                                <option value="CANCELADO">CANCELADO</option>
-                            </select>
-                        </div>
-                        <div class="filter-group">
-                            <label>Transportadora</label>
-                            <select id="filtroTransp3" onchange="filtrarTabela(3)">
-                                <option value="">Todos</option>
-                                <option value="ATIVA">ATIVA</option>
-                                <option value="BRASPRESS">BRASPRESS</option>
-                                <option value="TROCA">TROCA</option>
-                            </select>
-                        </div>
-                        <div class="filter-group">
-                            <label>Ordenar por</label>
-                            <select id="ordenacao3" onchange="filtrarTabela(3)">
-                                <option value="criado_desc">Mais recentes</option>
-                                <option value="criado_asc">Mais antigos</option>
-                                <option value="nf_asc">NF (A-Z)</option>
-                                <option value="nf_desc">NF (Z-A)</option>
-                                <option value="data_exp_asc">Expedição (Crescente)</option>
-                                <option value="data_exp_desc">Expedição (Decrescente)</option>
-                            </select>
-                        </div>
+                        <div class="filter-group"><label>Buscar NF/Pedido</label><input type="text" id="buscaNF3" placeholder="Digite NF ou pedido..." onkeyup="filtrarTabela(3)"></div>
+                        <div class="filter-group"><label>Status</label><select id="filtroStatus3" onchange="filtrarTabela(3)"><option value="">Todos</option><option value="ENTREGUE">ENTREGUE</option><option value="EM ROTA">EM ROTA</option><option value="ENTREGA AGENDADA">ENTREGA AGENDADA</option><option value="AGUARDANDO AGENDAMENTO">AGUARDANDO AGENDAMENTO</option><option value="CANCELADO">CANCELADO</option></select></div>
+                        <div class="filter-group"><label>Transportadora</label><select id="filtroTransp3" onchange="filtrarTabela(3)"><option value="">Todos</option><option value="ATIVA">ATIVA</option><option value="BRASPRESS">BRASPRESS</option><option value="TROCA">TROCA</option></select></div>
+                        <div class="filter-group"><label>Ordenar</label><select id="ordenacao3" onchange="filtrarTabela(3)"><option value="criado_desc">Mais recentes</option><option value="criado_asc">Mais antigos</option></select></div>
                     </div>
                 </div>
                 <div class="table-container" id="tabelaPacheco"></div>
@@ -724,13 +182,13 @@
             <div class="content" id="aba-5">
                 <div class="form-container">
                     <div class="form-title">📥 Importar Dados da Planilha</div>
-                    <p style="color: #666; margin-bottom: 20px; font-size: 13px;">Importe dados de sua planilha Excel/CSV anterior. Formatos aceitos: .xlsx, .csv</p>
+                    <p style="color: #666; margin-bottom: 20px; font-size: 13px;">Importe dados de sua planilha Excel/CSV. Formatos aceitos: .xlsx, .csv</p>
                     
                     <div style="background: #fff3cd; border: 1px solid #ffc107; border-radius: 6px; padding: 12px; margin-bottom: 20px; font-size: 12px; color: #856404;">
                         <strong>⚠️ Atenção:</strong> Se receber erro de "duplicate key", clique no botão abaixo para limpar todos os registros e importar do zero.
                     </div>
 
-                    <button class="btn" style="background: #ef4444; color: white; width: 100%; margin-bottom: 15px;" onclick="limparTodosRegistros()">🗑️ Limpar Todos os Registros (Se houver erro de duplicação)</button>
+                    <button class="btn" style="background: #ef4444; color: white; width: 100%; margin-bottom: 15px;" onclick="limparTodosRegistros()">🗑️ Limpar Todos os Registros</button>
                     
                     <div class="import-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
                         <div style="font-size: 30px; margin-bottom: 10px;">📄</div>
@@ -739,13 +197,15 @@
                         <input type="file" id="fileInput" accept=".xlsx,.csv,.xls" onchange="importarArquivo(event)">
                     </div>
 
+                    <button class="btn btn-primary" style="margin-top: 15px; max-width: 300px;" onclick="fazerDebugArquivo()">🔍 Debug do Arquivo (sem importar)</button>
+
                     <div id="importStatus"></div>
                 </div>
             </div>
 
             <!-- ABA 6: CONFIG -->
             <div class="content" id="aba-6">
-                <div class="config-section">
+                <div class="form-container">
                     <div class="form-title">⚙️ Configuração do Supabase</div>
                     <div class="form-grid">
                         <div class="form-group" style="grid-column: 1/-1;">
@@ -761,7 +221,7 @@
 
                     <h3 style="color: #0a3922; margin-bottom: 15px;">Links de Rastreamento:</h3>
                     <ul style="margin-left: 20px; font-size: 13px; color: #666; line-height: 1.8;">
-                        <li><strong>ATIVA:</strong> https://ativalog.com.br/area-do-cliente/ (CNPJ: 49345358000145)</li>
+                        <li><strong>ATIVA:</strong> https://ativalog.com.br/area-do-cliente/</li>
                         <li><strong>BRASPRESS:</strong> https://www.braspress.com.br/w/tracking/</li>
                         <li><strong>TROCA:</strong> https://rastreamento.grupotroca.com.br</li>
                     </ul>
@@ -770,7 +230,6 @@
         </div>
     </div>
 
-    <!-- MODAL DE EDIÇÃO -->
     <div class="modal" id="modalEditar">
         <div class="modal-content">
             <div class="modal-header">Editar Agendamento</div>
@@ -791,7 +250,6 @@
         function mudarAba(index) {
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('.content').forEach(div => div.classList.remove('active'));
-            
             document.querySelectorAll('.tab-btn')[index].classList.add('active');
             document.getElementById('aba-' + index).classList.add('active');
         }
@@ -804,28 +262,18 @@
             setTimeout(() => toast.classList.remove('show'), 3000);
         }
 
-        function mostrarMsg(texto, tipo) {
-            const msg = document.getElementById('message');
-            msg.textContent = texto;
-            msg.className = 'message show ' + tipo;
-            setTimeout(() => msg.classList.remove('show'), 3000);
-        }
-
         function salvarConfig() {
             const url = document.getElementById('supabaseUrl').value.trim();
             const key = document.getElementById('supabaseKey').value.trim();
-
             if (!url || !key) {
                 mostrarToast('Preencha URL e Chave', 'error');
                 return;
             }
-
             localStorage.setItem('supabaseUrl', url);
             localStorage.setItem('supabaseKey', key);
-            
             try {
                 sbClient = window.supabase.createClient(url, key);
-                mostrarToast('Supabase configurado com sucesso!', 'success');
+                mostrarToast('Supabase configurado!', 'success');
                 carregarTodos();
             } catch (err) {
                 mostrarToast('Erro: ' + err.message, 'error');
@@ -837,7 +285,6 @@
                 mostrarToast('Configure Supabase na aba Config', 'error');
                 return;
             }
-
             const dados = {
                 rede: document.getElementById('rede').value || null,
                 dt_pedido: document.getElementById('dtPedido').value || null,
@@ -856,12 +303,10 @@
                 data_entrega: document.getElementById('dataEntrega').value || null,
                 observacao: document.getElementById('observacao').value || null
             };
-
             try {
                 const { error } = await sbClient.from('agendamentos').upsert([dados]);
                 if (error) throw error;
-
-                mostrarToast('Agendamento salvo e sincronizado!', 'success');
+                mostrarToast('Agendamento salvo!', 'success');
                 limparForm();
                 carregarTodos();
             } catch (err) {
@@ -871,18 +316,15 @@
 
         async function carregarTodos() {
             if (!sbClient) return;
-
             try {
                 const { data, error } = await sbClient.from('agendamentos').select('*').order('criado_em', { ascending: false });
                 if (error) {
                     console.error('Erro ao carregar:', error);
                     return;
                 }
-                
                 todosRegistros = data || [];
                 console.log(`✅ Carregados ${todosRegistros.length} registros`);
                 renderizarTodas();
-                // Não mostrar toast aqui - causa spam a cada 30 segundos
             } catch (err) {
                 console.error('Erro:', err);
             }
@@ -890,17 +332,12 @@
 
         async function forcarRecarregamento() {
             if (!sbClient) {
-                mostrarToast('Configure Supabase na aba Config', 'error');
+                mostrarToast('Configure Supabase', 'error');
                 return;
             }
-
             try {
-                const { data, error } = await sbClient.from('agendamentos').select('*', { count: 'exact' });
-                if (error) throw error;
-
-                const totalRegistros = data ? data.length : 0;
-                mostrarToast(`Verificando... Total de ${totalRegistros} registros`, 'success');
-                
+                const { data } = await sbClient.from('agendamentos').select('*', { count: 'exact' });
+                mostrarToast(`Verificando... ${data ? data.length : 0} registros`, 'success');
                 await carregarTodos();
             } catch (err) {
                 mostrarToast('Erro: ' + err.message, 'error');
@@ -908,15 +345,7 @@
         }
 
         function renderizarTodas() {
-            console.log('📊 Renderizando tabelas...');
-            console.log(`Total de registros: ${todosRegistros.length}`);
-            
-            const redes = ['AMAZON', 'SÃO PAULO', 'PACHECO'];
-            redes.forEach((rede, idx) => {
-                const registros = todosRegistros.filter(r => r.rede === rede);
-                console.log(`${rede}: ${registros.length} registros`);
-            });
-            
+            console.log('📊 Renderizando tabelas... Total:', todosRegistros.length);
             renderizarTabela('AMAZON', 'tabelaAmazon', 1);
             renderizarTabela('SÃO PAULO', 'tabelaSaoPaulo', 2);
             renderizarTabela('PACHECO', 'tabelaPacheco', 3);
@@ -930,130 +359,35 @@
             return dias >= 0 ? dias + 'd' : '-';
         }
 
-        function calcularTempoAgendamento(dataExpedicao, dataReagendamento, dataAgendamento) {
-            if (dataReagendamento && dataExpedicao) {
-                return calcularTempo(dataExpedicao, dataReagendamento);
-            }
-            if (dataAgendamento && dataExpedicao) {
-                return calcularTempo(dataExpedicao, dataAgendamento);
-            }
-            return '-';
-        }
-
         function filtrarTabela(abaIndex) {
             const redes = ['AMAZON', 'SÃO PAULO', 'PACHECO'];
-            const rede = redes[abaIndex - 1];
-            const ids = ['tabelaAmazon', 'tabelaSaoPaulo', 'tabelaPacheco'];
-            renderizarTabela(rede, ids[abaIndex - 1], abaIndex);
+            renderizarTabela(redes[abaIndex - 1], ['tabelaAmazon', 'tabelaSaoPaulo', 'tabelaPacheco'][abaIndex - 1], abaIndex);
         }
 
         function renderizarTabela(rede, containerId, abaIndex) {
             const container = document.getElementById(containerId);
-            let registros = todosRegistros.filter(r => {
-                const redeDoRegistro = r.rede || r.Rede;
-                return redeDoRegistro === rede;
-            });
+            let registros = todosRegistros.filter(r => r.rede === rede);
 
             const busca = document.getElementById(`buscaNF${abaIndex}`)?.value.toLowerCase() || '';
-            const statusFilter = document.getElementById(`filtroStatus${abaIndex}`)?.value || '';
-            const transpFilter = document.getElementById(`filtroTransp${abaIndex}`)?.value || '';
-            const ordenacao = document.getElementById(`ordenacao${abaIndex}`)?.value || 'criado_desc';
-
             if (busca) {
-                registros = registros.filter(r => {
-                    const nf = r.nf || r.NF || r.Nf || '';
-                    const pedido = r.num_pedido || r.Num_Pedido || r.num_Pedido || '';
-                    return nf.toLowerCase().includes(busca) || pedido.toLowerCase().includes(busca);
-                });
+                registros = registros.filter(r => 
+                    (r.nf && r.nf.toLowerCase().includes(busca)) || 
+                    (r.num_pedido && r.num_pedido.toLowerCase().includes(busca))
+                );
             }
-
-            if (statusFilter) {
-                registros = registros.filter(r => {
-                    const status = r.status || r.Status;
-                    return status === statusFilter;
-                });
-            }
-
-            if (transpFilter) {
-                registros = registros.filter(r => {
-                    const transp = r.transportadora || r.Transportadora;
-                    return transp === transpFilter;
-                });
-            }
-
-            registros.sort((a, b) => {
-                switch(ordenacao) {
-                    case 'criado_asc':
-                        return new Date(a.criado_em) - new Date(b.criado_em);
-                    case 'nf_asc':
-                        return ((a.nf || a.NF || '') + '').localeCompare((b.nf || b.NF || '') + '');
-                    case 'nf_desc':
-                        return ((b.nf || b.NF || '') + '').localeCompare((a.nf || a.NF || '') + '');
-                    case 'data_exp_asc':
-                        return new Date(a.data_expedicao || a.Data_Expedicao || 0) - new Date(b.data_expedicao || b.Data_Expedicao || 0);
-                    case 'data_exp_desc':
-                        return new Date(b.data_expedicao || b.Data_Expedicao || 0) - new Date(a.data_expedicao || a.Data_Expedicao || 0);
-                    default:
-                        return new Date(b.criado_em) - new Date(a.criado_em);
-                }
-            });
 
             if (registros.length === 0) {
                 container.innerHTML = '<div class="empty-state">📭 Nenhum agendamento</div>';
                 return;
             }
 
-            let html = `<table>
-                <thead>
-                    <tr>
-                        <th>NF</th>
-                        <th>Pedido</th>
-                        <th>Dt Pedido</th>
-                        <th>Lead Time</th>
-                        <th>CD</th>
-                        <th>Data SAP</th>
-                        <th>Data Faturamento</th>
-                        <th>Dt Solicitação</th>
-                        <th>Dt Agendamento</th>
-                        <th>Dt Reagendamento</th>
-                        <th>Data Expedição</th>
-                        <th>Transportadora</th>
-                        <th>Status</th>
-                        <th>Data Entrega</th>
-                        <th>Observação</th>
-                        <th class="tempo-cell">T. Digi</th>
-                        <th class="tempo-cell">T. Fatu</th>
-                        <th class="tempo-cell">T. Expe</th>
-                        <th class="tempo-cell">T. Agen</th>
-                        <th class="tempo-cell">T. Entre</th>
-                        <th class="tempo-cell">Total</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody>`;
+            let html = `<table><thead><tr><th>NF</th><th>Pedido</th><th>Dt Pedido</th><th>Lead Time</th><th>CD</th><th>Data SAP</th><th>Data Faturamento</th><th>Dt Solicitação</th><th>Dt Agendamento</th><th>Dt Reagendamento</th><th>Data Expedição</th><th>Transportadora</th><th>Status</th><th>Data Entrega</th><th>Observação</th><th class="tempo-cell">T. Digi</th><th class="tempo-cell">T. Fatu</th><th class="tempo-cell">T. Expe</th><th class="tempo-cell">T. Agen</th><th class="tempo-cell">T. Entre</th><th class="tempo-cell">Total</th><th>Ações</th></tr></thead><tbody>`;
 
             registros.forEach(r => {
-                const nf = r.nf || r.NF || r.Nf || '';
-                const pedido = r.num_pedido || r.Num_Pedido || r.num_Pedido || '';
-                const dtPedido = r.dt_pedido || r.Dt_Pedido || r.Data_Pedido;
-                const leadTime = r.lead_time || r.Lead_Time || r.lead_Time;
-                const cd = r.cd || r.CD;
-                const dataSap = r.data_sap || r.Data_SAP || r.Data_Sap;
-                const dataFaturamento = r.data_faturamento || r.Data_Faturamento;
-                const dataSolicitacao = r.data_solicitacao || r.Data_Solicitacao;
-                const dataAgendamento = r.data_agendamento || r.Data_Agendamento;
-                const dataReagendamento = r.data_reagendamento || r.Data_Reagendamento;
-                const dataExpedicao = r.data_expedicao || r.Data_Expedicao || r.Data_Expedição;
-                const transportadora = r.transportadora || r.Transportadora;
-                const status = r.status || r.Status;
-                const dataEntrega = r.data_entrega || r.Data_Entrega;
-                const observacao = r.observacao || r.Observacao;
-
-                const tempoDigitacao = calcularTempo(dtPedido, dataSap);
-                const tempoFaturamento = calcularTempo(dataSap, dataFaturamento);
-                const tempoExpedicao = calcularTempo(dataFaturamento, dataExpedicao);
-                const tempoAgendamento = calcularTempoAgendamento(dataExpedicao, dataReagendamento, dataAgendamento);
-                const tempoEntrega = calcularTempo(dataExpedicao, dataEntrega);
+                const tempoDigitacao = calcularTempo(r.dt_pedido, r.data_sap);
+                const tempoFaturamento = calcularTempo(r.data_sap, r.data_faturamento);
+                const tempoExpedicao = calcularTempo(r.data_faturamento, r.data_expedicao);
+                const tempoEntrega = calcularTempo(r.data_expedicao, r.data_entrega);
                 
                 let totalLeadTime = '-';
                 if (tempoDigitacao !== '-' && tempoFaturamento !== '-' && tempoExpedicao !== '-' && tempoEntrega !== '-') {
@@ -1064,38 +398,7 @@
                     totalLeadTime = (tD + tF + tE + tEn) + 'd';
                 }
 
-                const statusBadge = getStatusBadge(status);
-                
-                html += `<tr>
-                    <td><strong>${nf}</strong></td>
-                    <td>${pedido || '-'}</td>
-                    <td>${formatarData(dtPedido)}</td>
-                    <td>${leadTime || '-'}</td>
-                    <td>${cd || '-'}</td>
-                    <td>${formatarData(dataSap)}</td>
-                    <td>${formatarData(dataFaturamento)}</td>
-                    <td>${formatarData(dataSolicitacao)}</td>
-                    <td>${formatarData(dataAgendamento)}</td>
-                    <td>${formatarData(dataReagendamento)}</td>
-                    <td>${formatarData(dataExpedicao)}</td>
-                    <td>${transportadora || '-'}</td>
-                    <td>${statusBadge}</td>
-                    <td>${formatarData(dataEntrega)}</td>
-                    <td style="max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${observacao || ''}">${observacao || '-'}</td>
-                    <td class="tempo-cell">${tempoDigitacao}</td>
-                    <td class="tempo-cell">${tempoFaturamento}</td>
-                    <td class="tempo-cell">${tempoExpedicao}</td>
-                    <td class="tempo-cell">${tempoAgendamento}</td>
-                    <td class="tempo-cell">${tempoEntrega}</td>
-                    <td class="tempo-cell">${totalLeadTime}</td>
-                    <td>
-                        <div class="actions">
-                            <button class="btn btn-sm btn-rastrear" onclick="rastrear('${transportadora}', '${nf}')">Rastrear</button>
-                            <button class="btn btn-sm btn-edit" onclick="abrirEdicao('${r.id}')">✏️</button>
-                            <button class="btn btn-sm btn-delete" onclick="deletarRegistro('${r.id}')">🗑️</button>
-                        </div>
-                    </td>
-                </tr>`;
+                html += `<tr><td><strong>${r.nf}</strong></td><td>${r.num_pedido || '-'}</td><td>${formatarData(r.dt_pedido)}</td><td>${r.lead_time || '-'}</td><td>${r.cd || '-'}</td><td>${formatarData(r.data_sap)}</td><td>${formatarData(r.data_faturamento)}</td><td>${formatarData(r.data_solicitacao)}</td><td>${formatarData(r.data_agendamento)}</td><td>${formatarData(r.data_reagendamento)}</td><td>${formatarData(r.data_expedicao)}</td><td>${r.transportadora || '-'}</td><td>${r.status || '-'}</td><td>${formatarData(r.data_entrega)}</td><td>${r.observacao || '-'}</td><td class="tempo-cell">${tempoDigitacao}</td><td class="tempo-cell">${tempoFaturamento}</td><td class="tempo-cell">${tempoExpedicao}</td><td class="tempo-cell">-</td><td class="tempo-cell">${tempoEntrega}</td><td class="tempo-cell">${totalLeadTime}</td><td><div class="actions"><button class="btn btn-sm btn-rastrear" onclick="rastrear('${r.transportadora}', '${r.nf}')">Rastrear</button><button class="btn btn-sm btn-edit" onclick="abrirEdicao('${r.id}')">✏️</button><button class="btn btn-sm btn-delete" onclick="deletarRegistro('${r.id}')">🗑️</button></div></td></tr>`;
             });
 
             html += '</tbody></table>';
@@ -1105,15 +408,6 @@
         function formatarData(data) {
             if (!data) return '-';
             return new Date(data).toLocaleDateString('pt-BR');
-        }
-
-        function getStatusBadge(status) {
-            const classes = {
-                'ENTREGUE': 'status-entregue',
-                'EM ROTA': 'status-em-rota',
-                'ENTREGA AGENDADA': 'status-agendado'
-            };
-            return `<span class="status-badge ${classes[status] || ''}"> ${status || '-'}</span>`;
         }
 
         function rastrear(transportadora, nf) {
@@ -1128,10 +422,8 @@
         function abrirEdicao(id) {
             const reg = todosRegistros.find(r => r.id === id);
             if (!reg) return;
-
             registroEmEdicao = reg;
             const form = document.getElementById('modalForm');
-            
             form.innerHTML = `
                 <div class="form-group"><label>Rede</label><input type="text" value="${reg.rede}" disabled></div>
                 <div class="form-group"><label>NF</label><input type="text" id="edit_nf" value="${reg.nf}"></div>
@@ -1139,18 +431,17 @@
                 <div class="form-group"><label>Data Pedido</label><input type="date" id="edit_dtPedido" value="${reg.dt_pedido || ''}"></div>
                 <div class="form-group"><label>Lead Time</label><input type="number" id="edit_leadTime" value="${reg.lead_time || ''}"></div>
                 <div class="form-group"><label>CD</label><input type="text" id="edit_cd" value="${reg.cd || ''}"></div>
-                <div class="form-group"><label>Data SAP</label><input type="date" id="edit_dataSap" value="${reg.data_sap}"></div>
-                <div class="form-group"><label>Data Faturamento</label><input type="date" id="edit_dataFaturamento" value="${reg.data_faturamento}"></div>
+                <div class="form-group"><label>Data SAP</label><input type="date" id="edit_dataSap" value="${reg.data_sap || ''}"></div>
+                <div class="form-group"><label>Data Faturamento</label><input type="date" id="edit_dataFaturamento" value="${reg.data_faturamento || ''}"></div>
                 <div class="form-group"><label>Data Solicitação</label><input type="date" id="edit_dataSolicitacao" value="${reg.data_solicitacao || ''}"></div>
                 <div class="form-group"><label>Data Agendamento</label><input type="date" id="edit_dataAgendamento" value="${reg.data_agendamento || ''}"></div>
                 <div class="form-group"><label>Data Reagendamento</label><input type="date" id="edit_dataReagendamento" value="${reg.data_reagendamento || ''}"></div>
-                <div class="form-group"><label>Data Expedição</label><input type="date" id="edit_dataExpedicao" value="${reg.data_expedicao}"></div>
+                <div class="form-group"><label>Data Expedição</label><input type="date" id="edit_dataExpedicao" value="${reg.data_expedicao || ''}"></div>
                 <div class="form-group"><label>Transportadora</label><select id="edit_transportadora"><option value="">-- Selecione --</option><option value="ATIVA" ${reg.transportadora === 'ATIVA' ? 'selected' : ''}>ATIVA</option><option value="BRASPRESS" ${reg.transportadora === 'BRASPRESS' ? 'selected' : ''}>BRASPRESS</option><option value="TROCA" ${reg.transportadora === 'TROCA' ? 'selected' : ''}>TROCA</option></select></div>
                 <div class="form-group"><label>Status</label><select id="edit_status"><option value="">-- Selecione --</option><option value="ENTREGUE" ${reg.status === 'ENTREGUE' ? 'selected' : ''}>ENTREGUE</option><option value="EM ROTA" ${reg.status === 'EM ROTA' ? 'selected' : ''}>EM ROTA</option><option value="ENTREGA AGENDADA" ${reg.status === 'ENTREGA AGENDADA' ? 'selected' : ''}>ENTREGA AGENDADA</option><option value="AGUARDANDO AGENDAMENTO" ${reg.status === 'AGUARDANDO AGENDAMENTO' ? 'selected' : ''}>AGUARDANDO AGENDAMENTO</option><option value="CANCELADO" ${reg.status === 'CANCELADO' ? 'selected' : ''}>CANCELADO</option></select></div>
                 <div class="form-group"><label>Data Entrega</label><input type="date" id="edit_dataEntrega" value="${reg.data_entrega || ''}"></div>
                 <div class="form-group" style="grid-column: 1/-1;"><label>Observação</label><textarea id="edit_observacao" style="resize: vertical; min-height: 60px;">${reg.observacao || ''}</textarea></div>
             `;
-
             document.getElementById('modalEditar').classList.add('show');
         }
 
@@ -1160,7 +451,6 @@
 
         async function salvarEdicao() {
             if (!registroEmEdicao) return;
-
             const dados = {
                 ...registroEmEdicao,
                 nf: document.getElementById('edit_nf').value,
@@ -1168,23 +458,21 @@
                 dt_pedido: document.getElementById('edit_dtPedido').value || null,
                 lead_time: document.getElementById('edit_leadTime').value ? parseInt(document.getElementById('edit_leadTime').value) : null,
                 cd: document.getElementById('edit_cd').value || null,
-                data_sap: document.getElementById('edit_dataSap').value,
-                data_faturamento: document.getElementById('edit_dataFaturamento').value,
+                data_sap: document.getElementById('edit_dataSap').value || null,
+                data_faturamento: document.getElementById('edit_dataFaturamento').value || null,
                 data_solicitacao: document.getElementById('edit_dataSolicitacao').value || null,
                 data_agendamento: document.getElementById('edit_dataAgendamento').value || null,
                 data_reagendamento: document.getElementById('edit_dataReagendamento').value || null,
-                data_expedicao: document.getElementById('edit_dataExpedicao').value,
+                data_expedicao: document.getElementById('edit_dataExpedicao').value || null,
                 transportadora: document.getElementById('edit_transportadora').value || null,
                 status: document.getElementById('edit_status').value || null,
                 data_entrega: document.getElementById('edit_dataEntrega').value || null,
                 observacao: document.getElementById('edit_observacao').value || null
             };
-
             try {
                 const { error } = await sbClient.from('agendamentos').update(dados).eq('id', registroEmEdicao.id);
                 if (error) throw error;
-
-                mostrarToast('Alterações sincronizadas com sucesso!', 'success');
+                mostrarToast('Alterações sincronizadas!', 'success');
                 fecharModal();
                 carregarTodos();
             } catch (err) {
@@ -1193,12 +481,10 @@
         }
 
         async function deletarRegistro(id) {
-            if (!confirm('Tem certeza que deseja deletar este agendamento?')) return;
-
+            if (!confirm('Tem certeza que deseja deletar?')) return;
             try {
                 const { error } = await sbClient.from('agendamentos').delete().eq('id', id);
                 if (error) throw error;
-
                 mostrarToast('Agendamento deletado!', 'success');
                 carregarTodos();
             } catch (err) {
@@ -1206,58 +492,77 @@
             }
         }
 
-        function limparForm() {
-            document.querySelectorAll('#aba-0 input, #aba-0 select, #aba-0 textarea').forEach(el => el.value = '');
-        }
-
         async function limparTodosRegistros() {
             if (!sbClient) {
-                mostrarToast('Configure Supabase na aba Config', 'error');
+                mostrarToast('Configure Supabase', 'error');
                 return;
             }
-
-            const confirmar = confirm('⚠️ ATENÇÃO!\n\nIsso vai DELETAR TODOS os registros no banco de dados!\n\nDeseja continuar?');
-            if (!confirmar) return;
-
-            const confirmar2 = confirm('Tem CERTEZA? Essa ação é IRREVERSÍVEL!');
-            if (!confirmar2) return;
-
+            if (!confirm('ATENÇÃO! Isso vai DELETAR TODOS os registros!')) return;
+            if (!confirm('Tem CERTEZA? Essa ação é IRREVERSÍVEL!')) return;
             try {
-                mostrarToast('🗑️ Limpando registros... Aguarde...', 'success');
-
-                // Deletar TUDO de uma vez usando is not null
-                const { error, data } = await sbClient
-                    .from('agendamentos')
-                    .delete()
-                    .gt('criado_em', '2000-01-01'); // Delete tudo que foi criado após 2000
-                
+                mostrarToast('🗑️ Limpando...', 'success');
+                const { error } = await sbClient.from('agendamentos').delete().gt('criado_em', '2000-01-01');
                 if (error) throw error;
-
-                mostrarToast('✅ Todos os registros foram deletados! Pronto para importar.', 'success');
+                mostrarToast('✅ Todos os registros foram deletados!', 'success');
                 todosRegistros = [];
                 renderizarTodas();
             } catch (err) {
-                console.error('Erro ao limpar:', err);
-                mostrarToast('Erro ao limpar: ' + err.message, 'error');
+                mostrarToast('Erro: ' + err.message, 'error');
             }
+        }
+
+        function fazerDebugArquivo() {
+            const fileInput = document.getElementById('fileInput');
+            if (!fileInput.files || fileInput.files.length === 0) {
+                alert('⚠️ Selecione um arquivo primeiro!');
+                fileInput.click();
+                return;
+            }
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = e.target.result;
+                    const workbook = XLSX.read(data, { type: 'binary' });
+                    const abas_validas = ['AMAZON', 'AMAZON1', 'SÃO PAULO', 'PACHECO'];
+                    let debugInfo = '📋 DEBUG EXATO DAS COLUNAS:\n\n';
+                    for (const sheet_name of workbook.SheetNames) {
+                        if (!abas_validas.includes(sheet_name)) continue;
+                        const json = XLSX.utils.sheet_to_json(workbook.Sheets[sheet_name]);
+                        if (json.length === 0) continue;
+                        const headers = Object.keys(json[0]);
+                        debugInfo += `═══════════════════════════\nABA: ${sheet_name}\nTotal de colunas: ${headers.length}\n═══════════════════════════\n`;
+                        debugInfo += `Nomes das colunas:\n`;
+                        headers.forEach((h, idx) => {
+                            debugInfo += `[${idx}] "${h}"\n`;
+                        });
+                        debugInfo += `\n1º REGISTRO:\n`;
+                        const firstRecord = json[0];
+                        headers.forEach(h => {
+                            debugInfo += `"${h}": ${firstRecord[h]}\n`;
+                        });
+                        debugInfo += `\n`;
+                    }
+                    console.log(debugInfo);
+                    alert(debugInfo);
+                } catch (err) {
+                    alert('❌ Erro: ' + err.message);
+                }
+            };
+            reader.readAsBinaryString(file);
         }
 
         function importarArquivo(event) {
             const file = event.target.files[0];
             if (!file) return;
-
             const reader = new FileReader();
             reader.onload = async (e) => {
                 try {
                     const data = e.target.result;
                     let registrosFormatados = [];
-
-                    // Ler o Excel
                     const workbook = XLSX.read(data, { type: 'binary' });
-                    
-                    console.log('📋 ABAS ENCONTRADAS:', workbook.SheetNames);
+                    console.log('📋 ABAS:', workbook.SheetNames);
 
-                    // Importar abas de agendamento
                     const abas_config = {
                         'AMAZON': { rede: 'AMAZON', temCD: false, temSAP: false },
                         'AMAZON1': { rede: 'AMAZON', temCD: false, temSAP: false },
@@ -1266,100 +571,79 @@
                     };
                     
                     for (const sheet_name of workbook.SheetNames) {
-                        if (!abas_config[sheet_name]) {
-                            console.log(`⏭️ Ignorando aba: ${sheet_name}`);
-                            continue;
-                        }
-
-                        console.log(`📥 Processando aba: ${sheet_name}`);
-                        
+                        if (!abas_config[sheet_name]) continue;
                         const json = XLSX.utils.sheet_to_json(workbook.Sheets[sheet_name]);
-                        
-                        if (json.length === 0) {
-                            console.log(`   (vazia)`);
-                            continue;
-                        }
+                        if (json.length === 0) continue;
 
-                        console.log(`   ${json.length} registros encontrados`);
-
+                        console.log(`📥 ${sheet_name}: ${json.length} registros`);
                         const config = abas_config[sheet_name];
+                        const headers = Object.keys(json[0]);
 
-                        // Mapear os dados de acordo com a aba
                         const registros_aba = json.map(row => {
-                            // Normalizar nomes de colunas (remover espaços extras)
-                            const getValor = (chaves) => {
-                                for (const chave of chaves) {
-                                    if (row[chave] !== undefined && row[chave] !== null) {
-                                        return row[chave];
-                                    }
+                            const getValor = (coluna) => {
+                                // Tentar exato
+                                if (row[coluna] !== undefined && row[coluna] !== null && row[coluna] !== '') return row[coluna];
+                                // Tentar com espaço
+                                if (row[' ' + coluna] !== undefined && row[' ' + coluna] !== null && row[' ' + coluna] !== '') return row[' ' + coluna];
+                                // Tentar normalizando
+                                for (const h of headers) {
+                                    if (h.trim() === coluna && row[h]) return row[h];
                                 }
                                 return null;
                             };
 
-                            const registro = {
+                            return {
                                 rede: config.rede,
-                                dt_pedido: formatarDataEntrada(getValor(['Dt. Pedido'])),
-                                lead_time: parseInt(getValor(['Lead time'])) || null,
-                                cd: config.temCD ? getValor(['CD']) : null,
-                                data_sap: config.temSAP ? formatarDataEntrada(getValor(['Data. SAP'])) : null,
-                                data_faturamento: formatarDataEntrada(getValor([' Faturamento', 'Faturamento'])),
-                                nf: getValor(['NF']) || '',
-                                num_pedido: getValor(['N° do Pedido']),
-                                data_solicitacao: formatarDataEntrada(getValor(['Data da Solicitação'])),
-                                data_agendamento: formatarDataEntrada(getValor(['Data Agendamento'])),
-                                data_reagendamento: formatarDataEntrada(getValor(['Data Reagendamento'])),
-                                data_expedicao: formatarDataEntrada(getValor(['Data Expedição'])),
-                                transportadora: getValor(['Transportadora']),
-                                status: getValor(['Status']),
-                                data_entrega: formatarDataEntrada(getValor(['Data Entrega'])),
-                                observacao: getValor(['Observação', 'Observações'])
+                                dt_pedido: formatarDataEntrada(getValor('Dt. Pedido')),
+                                lead_time: parseInt(getValor('Lead time')) || null,
+                                cd: config.temCD ? getValor('CD') : null,
+                                data_sap: config.temSAP ? formatarDataEntrada(getValor('Data. SAP')) : null,
+                                data_faturamento: formatarDataEntrada(getValor('Faturamento')),
+                                nf: getValor('NF') || '',
+                                num_pedido: getValor('N° do Pedido'),
+                                data_solicitacao: formatarDataEntrada(getValor('Data da Solicitação')),
+                                data_agendamento: formatarDataEntrada(getValor('Data Agendamento')),
+                                data_reagendamento: formatarDataEntrada(getValor('Data Reagendamento')),
+                                data_expedicao: formatarDataEntrada(getValor('Data Expedição')),
+                                transportadora: getValor('Transportadora'),
+                                status: getValor('Status'),
+                                data_entrega: formatarDataEntrada(getValor('Data Entrega')),
+                                observacao: getValor('Observação')
                             };
-                            return registro;
                         });
 
                         registrosFormatados = registrosFormatados.concat(registros_aba);
-                        console.log(`   ✅ ${registros_aba.length} registros processados`);
                     }
 
                     if (registrosFormatados.length === 0) {
-                        mostrarToast('Nenhum dado válido encontrado nas abas de agendamento', 'error');
+                        mostrarToast('Nenhum dado encontrado', 'error');
                         return;
                     }
-
-                    console.log(`✅ Total de registros para importar: ${registrosFormatados.length}`);
 
                     if (!sbClient) {
-                        mostrarToast('Configure Supabase na aba Config', 'error');
+                        mostrarToast('Configure Supabase', 'error');
                         return;
                     }
 
-                    // Importar em lotes (100 registros por vez)
                     const tamanhoLote = 100;
-                    let registrosImportados = 0;
-
-                    mostrarToast(`⏳ Importando ${registrosFormatados.length} registros...`, 'success');
+                    let importados = 0;
+                    mostrarToast(`⏳ Importando ${registrosFormatados.length}...`, 'success');
 
                     for (let i = 0; i < registrosFormatados.length; i += tamanhoLote) {
                         const lote = registrosFormatados.slice(i, i + tamanhoLote);
                         const { error } = await sbClient.from('agendamentos').upsert(lote);
-                        
-                        if (error) {
-                            console.error(`Erro ao importar lote ${Math.floor(i/tamanhoLote) + 1}:`, error);
-                            throw error;
-                        }
-
-                        registrosImportados += lote.length;
-                        const percentual = Math.round((registrosImportados / registrosFormatados.length) * 100);
-                        console.log(`   Progresso: ${percentual}% (${registrosImportados}/${registrosFormatados.length})`);
+                        if (error) throw error;
+                        importados += lote.length;
+                        console.log(`   ${Math.round(importados/registrosFormatados.length*100)}%`);
                     }
 
-                    mostrarToast(`✅ ${registrosFormatados.length} registros importados com sucesso!`, 'success');
+                    mostrarToast(`✅ ${registrosFormatados.length} importados!`, 'success');
                     setTimeout(() => carregarTodos(), 500);
                     document.getElementById('fileInput').value = '';
 
                 } catch (err) {
-                    console.error('Erro ao importar:', err);
-                    mostrarToast('❌ Erro ao importar: ' + err.message, 'error');
+                    console.error('Erro:', err);
+                    mostrarToast('❌ Erro: ' + err.message, 'error');
                 }
             };
             reader.readAsBinaryString(file);
@@ -1376,20 +660,46 @@
             return null;
         }
 
+        function limparForm() {
+            document.querySelectorAll('#aba-0 input, #aba-0 select, #aba-0 textarea').forEach(el => el.value = '');
+        }
+
+        function mostrarTodos() {
+            if (todosRegistros.length === 0) {
+                document.getElementById('searchResults').innerHTML = '<div class="empty-state">📭 Nenhum registro</div>';
+                return;
+            }
+            let html = `<div style="background: #f0fdf4; padding: 15px; border-radius: 6px; margin-bottom: 15px; font-size: 13px;"><strong>📊 Total: ${todosRegistros.length} registros</strong></div><table><thead><tr><th>NF</th><th>Pedido</th><th>Rede</th><th>Dt Pedido</th><th>Expedição</th><th>Entrega</th><th>Status</th><th>Ações</th></tr></thead><tbody>`;
+            todosRegistros.slice(0, 200).forEach(r => {
+                html += `<tr><td><strong>${r.nf}</strong></td><td>${r.num_pedido || '-'}</td><td>${r.rede || '-'}</td><td>${formatarData(r.dt_pedido)}</td><td>${formatarData(r.data_expedicao)}</td><td>${formatarData(r.data_entrega)}</td><td>${r.status || '-'}</td><td><button class="btn btn-sm btn-edit" onclick="abrirEdicao('${r.id}')">✏️</button></td></tr>`;
+            });
+            html += '</tbody></table>';
+            document.getElementById('searchResults').innerHTML = html;
+        }
+
+        document.getElementById('searchInput')?.addEventListener('input', (e) => {
+            const termo = e.target.value.toLowerCase().trim();
+            if (!termo) {
+                document.getElementById('searchResults').innerHTML = '';
+                return;
+            }
+            const resultado = todosRegistros.filter(r => (r.nf && r.nf.toLowerCase().includes(termo)) || (r.num_pedido && r.num_pedido.toLowerCase().includes(termo)));
+            if (resultado.length === 0) {
+                document.getElementById('searchResults').innerHTML = '<div class="empty-state">🔍 Nenhum resultado</div>';
+                return;
+            }
+            let html = `<table><thead><tr><th>NF</th><th>Pedido</th><th>Rede</th><th>Expedição</th><th>Status</th><th>Ações</th></tr></thead><tbody>`;
+            resultado.forEach(r => {
+                html += `<tr><td><strong>${r.nf}</strong></td><td>${r.num_pedido || '-'}</td><td>${r.rede}</td><td>${formatarData(r.data_expedicao)}</td><td>${r.status || '-'}</td><td><button class="btn btn-sm btn-edit" onclick="abrirEdicao('${r.id}')">✏️</button></td></tr>`;
+            });
+            html += '</tbody></table>';
+            document.getElementById('searchResults').innerHTML = html;
+        });
+
         const dropZone = document.getElementById('dropZone');
-        dropZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            dropZone.classList.add('dragover');
-        });
-        dropZone.addEventListener('dragleave', () => {
-            dropZone.classList.remove('dragover');
-        });
-        dropZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            dropZone.classList.remove('dragover');
-            document.getElementById('fileInput').files = e.dataTransfer.files;
-            importarArquivo({ target: { files: e.dataTransfer.files } });
-        });
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+        dropZone.addEventListener('drop', (e) => { e.preventDefault(); dropZone.classList.remove('dragover'); document.getElementById('fileInput').files = e.dataTransfer.files; importarArquivo({ target: { files: e.dataTransfer.files } }); });
 
         window.addEventListener('load', () => {
             const url = localStorage.getItem('supabaseUrl');
@@ -1402,138 +712,7 @@
             }
         });
 
-        document.getElementById('searchInput')?.addEventListener('input', async (e) => {
-            const termo = e.target.value.toLowerCase().trim();
-            if (!termo || !sbClient) {
-                document.getElementById('searchResults').innerHTML = '';
-                return;
-            }
-
-            const resultado = todosRegistros.filter(r => 
-                (r.nf && r.nf.toLowerCase().includes(termo)) || 
-                (r.num_pedido && r.num_pedido.toLowerCase().includes(termo))
-            );
-
-            if (resultado.length === 0) {
-                document.getElementById('searchResults').innerHTML = '<div class="empty-state">🔍 Nenhum resultado</div>';
-                return;
-            }
-
-            let html = `<table>
-                <thead>
-                    <tr>
-                        <th>NF</th>
-                        <th>Pedido</th>
-                        <th>Rede</th>
-                        <th>Expedição</th>
-                        <th>Status</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody>`;
-
-            resultado.forEach(r => {
-                html += `<tr>
-                    <td><strong>${r.nf}</strong></td>
-                    <td>${r.num_pedido || '-'}</td>
-                    <td>${r.rede}</td>
-                    <td>${formatarData(r.data_expedicao)}</td>
-                    <td>${getStatusBadge(r.status)}</td>
-                    <td>
-                        <div class="actions">
-                            <button class="btn btn-sm btn-edit" onclick="abrirEdicao('${r.id}')">✏️</button>
-                            <button class="btn btn-sm btn-delete" onclick="deletarRegistro('${r.id}')">🗑️</button>
-                        </div>
-                    </td>
-                </tr>`;
-            });
-
-            html += '</tbody></table>';
-            document.getElementById('searchResults').innerHTML = html;
-        });
-
-        function mostrarTodos() {
-            if (todosRegistros.length === 0) {
-                document.getElementById('searchResults').innerHTML = '<div class="empty-state">📭 Nenhum registro encontrado</div>';
-                return;
-            }
-
-            // DEBUG: Mostrar primeiro registro completo COM VALORES
-            const primeiroRegistro = todosRegistros[0];
-            console.log('🔍 DEBUG - Primeiro registro COMPLETO:', primeiroRegistro);
-
-            let html = `<div style="background: #f0fdf4; padding: 15px; border-radius: 6px; margin-bottom: 15px; font-size: 13px;">
-                <strong>📊 Total: ${todosRegistros.length} registros</strong>
-            </div>`;
-
-            // Mostrar os campos disponíveis
-            if (primeiroRegistro) {
-                html += `<div style="background: #dbeafe; padding: 15px; border-radius: 6px; margin-bottom: 15px; font-size: 12px;">
-                    <strong>🔍 Campos encontrados:</strong><br>
-                    ${Object.keys(primeiroRegistro).join(', ')}
-                </div>`;
-
-                // Mostrar valores do primeiro registro
-                html += `<div style="background: #fef3c7; padding: 15px; border-radius: 6px; margin-bottom: 15px; font-size: 11px;">
-                    <strong>📋 Valores do 1º registro:</strong><br>
-                    <code style="display: block; margin-top: 10px; word-break: break-all;">`;
-                
-                Object.entries(primeiroRegistro).forEach(([key, value]) => {
-                    html += `${key}: ${value || '(vazio)'}<br>`;
-                });
-                
-                html += `</code></div>`;
-            }
-
-            html += `<table>
-                <thead>
-                    <tr>
-                        <th>NF</th>
-                        <th>Pedido</th>
-                        <th>Rede</th>
-                        <th>Dt Pedido</th>
-                        <th>Lead Time</th>
-                        <th>CD</th>
-                        <th>Data SAP</th>
-                        <th>Data Faturamento</th>
-                        <th>Expedição</th>
-                        <th>Status</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody>`;
-
-            todosRegistros.slice(0, 50).forEach(r => {
-                html += `<tr>
-                    <td><strong>${r.nf || '-'}</strong></td>
-                    <td>${r.num_pedido || '-'}</td>
-                    <td>${r.rede || '-'}</td>
-                    <td>${formatarData(r.dt_pedido)}</td>
-                    <td>${r.lead_time || '-'}</td>
-                    <td>${r.cd || '-'}</td>
-                    <td>${formatarData(r.data_sap)}</td>
-                    <td>${formatarData(r.data_faturamento)}</td>
-                    <td>${formatarData(r.data_expedicao)}</td>
-                    <td>${getStatusBadge(r.status)}</td>
-                    <td>
-                        <div class="actions">
-                            <button class="btn btn-sm btn-edit" onclick="abrirEdicao('${r.id}')">✏️</button>
-                            <button class="btn btn-sm btn-delete" onclick="deletarRegistro('${r.id}')">🗑️</button>
-                        </div>
-                    </td>
-                </tr>`;
-            });
-
-            html += '</tbody></table>';
-            document.getElementById('searchResults').innerHTML = html;
-        }
-
-        setInterval(() => { 
-            if (sbClient) {
-                carregarTodos();
-                // NÃO mostrar toast a cada sincronização automática
-            }
-        }, 30000);
+        setInterval(() => { if (sbClient) carregarTodos(); }, 30000);
     </script>
 </body>
 </html>
