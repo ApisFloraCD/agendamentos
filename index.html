@@ -669,15 +669,16 @@
 
         function renderizarTabela(rede, containerId, abaIndex) {
             const container = document.getElementById(containerId);
+            const t0 = performance.now();
             
             // PASSO 1: Filtrar por rede (rápido)
             let registros = todosRegistros.filter(r => r.rede === rede);
-            const totalPorRede = registros.length;
+            const t1 = performance.now();
+            console.log(`⏱️ [${rede}] Filtro rede: ${(t1-t0).toFixed(1)}ms (${registros.length} regs)`);
 
             if (abaIndex >= 2) {
-                // PASSO 2: Aplicar filtros em sequência (rápido)
+                // PASSO 2: Aplicar filtros
                 
-                // Filtro 1: Busca NF/Pedido
                 const busca = document.getElementById(`buscaNF${abaIndex}`)?.value.toLowerCase() || '';
                 if (busca) {
                     registros = registros.filter(r => 
@@ -686,13 +687,11 @@
                     );
                 }
 
-                // Filtro 2: Status
                 const statusFiltro = document.getElementById(`filtroStatus${abaIndex}`)?.value || '';
                 if (statusFiltro) {
                     registros = registros.filter(r => r.status === statusFiltro);
                 }
 
-                // Filtro 3: Tipo
                 const tipoFiltro = document.getElementById(`filtroTipo${abaIndex}`)?.value || '';
                 if (tipoFiltro) {
                     const hoje = new Date().toISOString().split('T')[0];
@@ -707,13 +706,15 @@
                     }
                 }
 
-                // Filtro 4: Transportadora
                 const transpFiltro = document.getElementById(`filtroTransp${abaIndex}`)?.value || '';
                 if (transpFiltro) {
                     registros = registros.filter(r => r.transportadora === transpFiltro);
                 }
 
-                // PASSO 3: Ordenação (apenas se houver resultado)
+                const t2 = performance.now();
+                console.log(`⏱️ [${rede}] Filtros aplicados: ${(t2-t1).toFixed(1)}ms (${registros.length} regs)`);
+
+                // PASSO 3: Ordenação
                 if (registros.length > 0) {
                     const ordenacao = document.getElementById(`ordenacao${abaIndex}`)?.value || '';
                     if (ordenacao) {
@@ -734,6 +735,8 @@
                         }
                     }
                 }
+                const t3 = performance.now();
+                console.log(`⏱️ [${rede}] Ordenação: ${(t3-t2).toFixed(1)}ms`);
             }
 
             if (registros.length === 0) {
@@ -741,7 +744,6 @@
                 return;
             }
 
-            // PASSO 4: Renderizar apenas os primeiros 50
             const limite = 50;
             const registrosMostrados = registros.slice(0, limite);
             const totalRegistros = registros.length;
@@ -750,7 +752,9 @@
             const labels = ['NF', 'Pedido', 'Dt Pedido', 'Lead Time', 'CD', 'Data SAP', 'Data Fat', 'Dt Solicit', 'Dt Agenda', 'Dt Reagenda', 'Data Exped', 'Transportadora', 'Status', 'Data Entrega', 'Observação'];
             const widths = ['80px', '80px', '85px', '70px', '60px', '85px', '85px', '85px', '85px', '85px', '85px', '130px', '130px', '85px', '100px'];
 
-            // Construir HTML super rápido
+            const t4 = performance.now();
+            
+            // Construir HTML
             const html = [];
             html.push(`<div style="background: #f0fdf4; padding: 10px 15px; border-radius: 6px; margin-bottom: 15px; font-size: 12px; color: #065f46;"><strong>📊 ${registrosMostrados.length} de ${totalRegistros}</strong>${totalRegistros > limite ? ' (refine filtros)' : ''}</div>`);
             html.push('<table style="width: 100%;"><thead><tr>');
@@ -768,8 +772,10 @@
                     if (col === 'transportadora' && valor !== '-') {
                         valor = transportadoras[valor] || valor;
                     }
-                    if (col.includes('data') && valor !== '-') {
-                        valor = new Date(valor).toLocaleDateString('pt-BR');
+                    if (col.includes('data') && valor !== '-' && valor.length === 10) {
+                        // Formato esperado: YYYY-MM-DD
+                        const [y, m, d] = valor.split('-');
+                        valor = `${d}/${m}/${y}`;
                     }
                     html.push(`<td style="width: ${widths[i]}; padding: 8px;">${valor}</td>`);
                 });
@@ -778,6 +784,10 @@
 
             html.push('</tbody></table>');
             container.innerHTML = html.join('');
+            
+            const t5 = performance.now();
+            console.log(`⏱️ [${rede}] Renderização HTML: ${(t5-t4).toFixed(1)}ms`);
+            console.log(`✅ [${rede}] TOTAL: ${(t5-t0).toFixed(1)}ms`);
         }
 
         function rastrear(transportadora, nf) {
