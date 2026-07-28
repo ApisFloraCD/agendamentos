@@ -710,7 +710,14 @@
             } else if (atual === 'asc') {
                 sortConfig[containerId][coluna] = 'desc';
             }
-            filtrarTabela(parseInt(containerId.match(/\d+/)[0]) || 0);
+            // Mapear containerId para abaIndex
+            const mapa = {
+                'tabelaAmazon': 2,
+                'tabelaSaoPaulo': 3,
+                'tabelaPacheco': 4
+            };
+            const abaIndex = mapa[containerId] || 0;
+            filtrarTabela(abaIndex);
         }
 
         function rastrear(transportadora, nf) {
