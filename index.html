@@ -876,17 +876,15 @@
                 const { data, error } = await sbClient.from('agendamentos').select('*').order('criado_em', { ascending: false });
                 if (error) {
                     console.error('Erro ao carregar:', error);
-                    mostrarToast('Erro ao carregar dados: ' + error.message, 'error');
                     return;
                 }
                 
                 todosRegistros = data || [];
                 console.log(`✅ Carregados ${todosRegistros.length} registros`);
                 renderizarTodas();
-                mostrarToast(`✅ ${todosRegistros.length} registros sincronizados!`, 'success');
+                // Não mostrar toast aqui - causa spam a cada 30 segundos
             } catch (err) {
                 console.error('Erro:', err);
-                mostrarToast('Erro: ' + err.message, 'error');
             }
         }
 
@@ -1516,7 +1514,12 @@
             document.getElementById('searchResults').innerHTML = html;
         }
 
-        setInterval(() => { if (sbClient) carregarTodos(); }, 30000);
+        setInterval(() => { 
+            if (sbClient) {
+                carregarTodos();
+                // NÃO mostrar toast a cada sincronização automática
+            }
+        }, 30000);
     </script>
 </body>
 </html>
