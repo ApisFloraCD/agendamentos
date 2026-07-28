@@ -14,7 +14,7 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #0a3922 0%, #0b6136 100%);
+            background: #f5f5f5;
             min-height: 100vh;
             padding: 20px;
         }
@@ -24,7 +24,8 @@
             margin: 0 auto;
             background: white;
             border-radius: 12px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
         }
 
         .header {
@@ -46,8 +47,8 @@
 
         .tabs {
             display: flex;
-            background: #f5f5f5;
-            border-bottom: 2px solid #0b6136;
+            background: white;
+            border-bottom: 2px solid #e0e0e0;
             flex-wrap: wrap;
             padding: 0;
         }
@@ -56,24 +57,24 @@
             flex: 1;
             min-width: 100px;
             padding: 15px 20px;
-            background: #f5f5f5;
+            background: white;
             border: none;
             cursor: pointer;
             font-size: 14px;
             font-weight: 600;
             color: #333;
             transition: all 0.3s;
-            border-bottom: 4px solid transparent;
+            border-bottom: 3px solid transparent;
         }
 
         .tab-btn:hover {
-            background: white;
+            background: #f9f9f9;
+            color: #0b6136;
         }
 
         .tab-btn.active {
-            color: white;
-            background: #0b6136;
-            border-bottom-color: #0a3922;
+            color: #0b6136;
+            border-bottom-color: #0b6136;
         }
 
         .content {
@@ -144,24 +145,14 @@
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #0a3922 0%, #0b6136 100%);
+            background: #0b6136;
             color: white;
             width: 100%;
             padding: 14px;
         }
 
         .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(10, 57, 34, 0.2);
-        }
-
-        .btn-link {
-            background: #0b6136;
-            color: white;
-            font-size: 12px;
-            padding: 8px 12px;
-            display: inline-block;
-            text-decoration: none;
+            background: #0a3922;
         }
 
         .message {
@@ -169,6 +160,7 @@
             border-radius: 6px;
             margin-bottom: 20px;
             display: none;
+            font-size: 14px;
         }
 
         .message.show {
@@ -231,11 +223,27 @@
         }
 
         tbody tr:hover {
-            background: #f5f5f5;
+            background: #f9f9f9;
         }
 
         td {
             padding: 10px 8px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            background: #e0e0e0;
+            color: #333;
         }
     </style>
 </head>
@@ -352,19 +360,19 @@
         <!-- ABA 1: AMAZON -->
         <div class="content" id="aba-1">
             <h2>Agendamentos Amazon</h2>
-            <p>Dados serão exibidos aqui após configurar Supabase</p>
+            <div id="tabelaAmazon"><p style="color: #999;">Configure Supabase na aba Config e salve agendamentos</p></div>
         </div>
 
         <!-- ABA 2: SÃO PAULO -->
         <div class="content" id="aba-2">
             <h2>Agendamentos São Paulo</h2>
-            <p>Dados serão exibidos aqui após configurar Supabase</p>
+            <div id="tabelaSaoPaulo"><p style="color: #999;">Configure Supabase na aba Config e salve agendamentos</p></div>
         </div>
 
         <!-- ABA 3: PACHECO -->
         <div class="content" id="aba-3">
             <h2>Agendamentos Pacheco</h2>
-            <p>Dados serão exibidos aqui após configurar Supabase</p>
+            <div id="tabelaPacheco"><p style="color: #999;">Configure Supabase na aba Config e salve agendamentos</p></div>
         </div>
 
         <!-- ABA 4: PESQUISA -->
@@ -406,11 +414,9 @@
         let sbClient = null;
 
         function mudarAba(index) {
-            // Remove active de todos
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('.content').forEach(div => div.classList.remove('active'));
             
-            // Adiciona active no clicado
             document.querySelectorAll('.tab-btn')[index].classList.add('active');
             document.getElementById('aba-' + index).classList.add('active');
         }
@@ -427,7 +433,7 @@
             const key = document.getElementById('supabaseKey').value.trim();
 
             if (!url || !key) {
-                mostrarMsg('Preencha URL e Chave', 'error');
+                mostrarMsg('❌ Preencha URL e Chave', 'error');
                 return;
             }
 
@@ -437,35 +443,151 @@
             try {
                 sbClient = window.supabase.createClient(url, key);
                 mostrarMsg('✅ Supabase configurado!', 'success');
+                carregarTodos();
             } catch (err) {
-                mostrarMsg('❌ Erro ao configurar: ' + err.message, 'error');
+                mostrarMsg('❌ Erro: ' + err.message, 'error');
             }
         }
 
-        function salvarAgendamento() {
+        async function salvarAgendamento() {
             if (!sbClient) {
-                mostrarMsg('Configure Supabase na aba Config', 'error');
+                mostrarMsg('❌ Configure Supabase na aba Config', 'error');
                 return;
             }
 
             const rede = document.getElementById('rede').value;
-            if (!rede) {
-                mostrarMsg('Selecione uma rede', 'error');
+            const nf = document.getElementById('nf').value.trim();
+            const dataSap = document.getElementById('dataSap').value;
+            const dataFaturamento = document.getElementById('dataFaturamento').value;
+            const dataExpedicao = document.getElementById('dataExpedicao').value;
+
+            if (!rede || !nf || !dataSap || !dataFaturamento || !dataExpedicao) {
+                mostrarMsg('❌ Preencha os campos obrigatórios (*)', 'error');
                 return;
             }
 
-            mostrarMsg('✅ Agendamento salvo! (teste)', 'success');
+            const dados = {
+                rede,
+                dt_pedido: document.getElementById('dtPedido').value || null,
+                lead_time: document.getElementById('leadTime').value ? parseInt(document.getElementById('leadTime').value) : null,
+                cd: document.getElementById('cd').value || null,
+                data_sap: dataSap,
+                data_faturamento: dataFaturamento,
+                nf: nf,
+                num_pedido: document.getElementById('numPedido').value || null,
+                data_solicitacao: document.getElementById('dataSolicitacao').value || null,
+                data_agendamento: document.getElementById('dataAgendamento').value || null,
+                data_reagendamento: document.getElementById('dataReagendamento').value || null,
+                data_expedicao: dataExpedicao,
+                transportadora: document.getElementById('transportadora').value || null,
+                status: document.getElementById('status').value || null,
+                data_entrega: document.getElementById('dataEntrega').value || null,
+                observacao: document.getElementById('observacao').value || null
+            };
+
+            try {
+                const { error } = await sbClient.from('agendamentos').upsert([dados]);
+                if (error) throw error;
+
+                mostrarMsg('✅ Agendamento salvo com sucesso!', 'success');
+                limparForm();
+                carregarTodos();
+            } catch (err) {
+                mostrarMsg('❌ Erro: ' + err.message, 'error');
+            }
         }
 
-        // Carregar config ao abrir
+        async function carregarTodos() {
+            if (!sbClient) return;
+
+            try {
+                const { data } = await sbClient.from('agendamentos').select('*').order('criado_em', { ascending: false });
+                
+                if (!data) return;
+
+                renderizarTabelas(data);
+            } catch (err) {
+                console.error('Erro:', err);
+            }
+        }
+
+        function renderizarTabelas(registros) {
+            const redes = [
+                { nome: 'AMAZON', id: 'tabelaAmazon' },
+                { nome: 'SÃO PAULO', id: 'tabelaSaoPaulo' },
+                { nome: 'PACHECO', id: 'tabelaPacheco' }
+            ];
+            
+            redes.forEach(rede => {
+                const registrosRede = registros.filter(r => r.rede === rede.nome);
+                const container = document.getElementById(rede.id);
+                
+                if (registrosRede.length === 0) {
+                    container.innerHTML = '<p style="color: #999;">Nenhum agendamento</p>';
+                    return;
+                }
+
+                let html = '<table><thead><tr><th>NF</th><th>Pedido</th><th>Data Pedido</th><th>Expedição</th><th>Transportadora</th><th>Status</th><th>Entrega</th></tr></thead><tbody>';
+
+                registrosRede.forEach(r => {
+                    html += `<tr>
+                        <td><strong>${r.nf}</strong></td>
+                        <td>${r.num_pedido || '-'}</td>
+                        <td>${r.dt_pedido ? new Date(r.dt_pedido).toLocaleDateString('pt-BR') : '-'}</td>
+                        <td>${r.data_expedicao ? new Date(r.data_expedicao).toLocaleDateString('pt-BR') : '-'}</td>
+                        <td>${r.transportadora || '-'}</td>
+                        <td><span class="status-badge">${r.status || '-'}</span></td>
+                        <td>${r.data_entrega ? new Date(r.data_entrega).toLocaleDateString('pt-BR') : '-'}</td>
+                    </tr>`;
+                });
+
+                html += '</tbody></table>';
+                container.innerHTML = html;
+            });
+        }
+
+        function limparForm() {
+            document.querySelectorAll('#aba-0 input, #aba-0 select, #aba-0 textarea').forEach(el => el.value = '');
+        }
+
         window.addEventListener('load', () => {
             const url = localStorage.getItem('supabaseUrl');
             const key = localStorage.getItem('supabaseKey');
             if (url && key) {
                 document.getElementById('supabaseUrl').value = url;
                 document.getElementById('supabaseKey').value = key;
+                sbClient = window.supabase.createClient(url, key);
+                carregarTodos();
             }
         });
+
+        document.getElementById('searchInput')?.addEventListener('input', async (e) => {
+            const termo = e.target.value.toLowerCase().trim();
+            if (!termo || !sbClient) {
+                document.getElementById('searchResults').innerHTML = '';
+                return;
+            }
+
+            try {
+                const { data } = await sbClient.from('agendamentos').select('*').or(`nf.ilike.%${termo}%,num_pedido.ilike.%${termo}%`);
+                
+                if (!data || data.length === 0) {
+                    document.getElementById('searchResults').innerHTML = '<p style="color: #999;">Nenhum resultado</p>';
+                    return;
+                }
+
+                let html = '<table><thead><tr><th>NF</th><th>Pedido</th><th>Rede</th><th>Expedição</th><th>Status</th></tr></thead><tbody>';
+                data.forEach(r => {
+                    html += `<tr><td>${r.nf}</td><td>${r.num_pedido || '-'}</td><td>${r.rede}</td><td>${r.data_expedicao ? new Date(r.data_expedicao).toLocaleDateString('pt-BR') : '-'}</td><td>${r.status || '-'}</td></tr>`;
+                });
+                html += '</tbody></table>';
+                document.getElementById('searchResults').innerHTML = html;
+            } catch (err) {
+                console.error('Erro:', err);
+            }
+        });
+
+        setInterval(() => { if (sbClient) carregarTodos(); }, 30000);
     </script>
 </body>
 </html>
