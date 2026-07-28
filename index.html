@@ -486,11 +486,18 @@
         async function carregarTodos() {
             if (!sbClient) return;
             try {
-                const { data, error } = await sbClient.from('agendamentos').select('*').order('criado_em', { ascending: false });
+                const t0 = performance.now();
+                // Remover .order() que é lento - trazer primeiro e ordenar no cliente
+                const { data, error } = await sbClient.from('agendamentos').select('*');
+                const t1 = performance.now();
+                console.log(`⏱️ Supabase select (SEM order): ${(t1-t0).toFixed(1)}ms`);
+                
                 if (error) {
                     console.error('Erro ao carregar:', error);
                     return;
                 }
+                
+                const t2 = performance.now();
                 // Normalizar status e transportador
                 todosRegistros = (data || []).map(r => {
                     let transportadora = r.transportadora || '';
@@ -508,10 +515,17 @@
                         transportadora: transportadora
                     };
                 });
+                const t3 = performance.now();
+                console.log(`⏱️ Normalização de dados: ${(t3-t2).toFixed(1)}ms`);
                 console.log(`✅ Carregados ${todosRegistros.length} registros`);
+                
                 atualizarDashboard();
                 renderizarTodas();
                 atualizarSelects();
+                
+                const t4 = performance.now();
+                console.log(`⏱️ Dashboard + Render: ${(t4-t3).toFixed(1)}ms`);
+                console.log(`✅ TOTAL CARREGAMENTO: ${(t4-t0).toFixed(1)}ms`);
             } catch (err) {
                 console.error('Erro:', err);
             }
@@ -740,7 +754,9 @@
             }
 
             if (registros.length === 0) {
-                container.innerHTML = '<div class="empty-state">📭 Nenhum agendamento encontrado</div>';
+                if (container) {
+                    container.innerHTML = '<div class="empty-state">📭 Nenhum agendamento encontrado</div>';
+                }
                 return;
             }
 
@@ -783,7 +799,9 @@
             });
 
             html.push('</tbody></table>');
-            container.innerHTML = html.join('');
+            if (container) {
+                container.innerHTML = html.join('');
+            }
             
             const t5 = performance.now();
             console.log(`⏱️ [${rede}] Renderização HTML: ${(t5-t4).toFixed(1)}ms`);
